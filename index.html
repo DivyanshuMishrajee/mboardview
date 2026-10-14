@@ -1,0 +1,3072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M-Board — Your Boards. Your Mission.</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08090B;--bg2:#101216;--card:#15181D;--card2:#1b1f27;
+  --gold:#D4AF37;--gold2:#F5D76E;--text:#F5F5F5;--muted:#A3A7B0;
+  --line:rgba(212,175,55,.18);--r:16px;
+  --phy:#4D9FFF;--chem:#2ED39B;--math:#A97BFF;--eng:#E7C97A;--pe:#E4572E;
+}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(1100px 600px at 82% -12%,rgba(212,175,55,.10) 0%,transparent 60%),
+    radial-gradient(900px 500px at -10% 18%,rgba(60,110,190,.10) 0%,transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',system-ui,-apple-system,'Inter',Roboto,Arial,sans-serif;
+  min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0b0c0f}
+::-webkit-scrollbar-thumb{background:#2a2d34;border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+
+/* ---------- HEADER ---------- */
+header{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;gap:18px;
+  padding:12px 22px;
+  background:rgba(8,9,11,.82);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.brand svg{width:38px;height:38px}
+.brand-txt{display:flex;flex-direction:column;line-height:1}
+.brand-txt b{font-size:19px;letter-spacing:.5px;
+  background:linear-gradient(120deg,var(--gold),var(--gold2),var(--gold));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.brand-txt span{font-size:9px;letter-spacing:2.6px;color:var(--muted);margin-top:3px}
+nav.main{display:flex;gap:4px;margin-left:8px;flex-wrap:wrap}
+nav.main a{
+  padding:8px 13px;border-radius:10px;font-size:13.5px;color:var(--muted);
+  transition:.22s;white-space:nowrap;border:1px solid transparent
+}
+nav.main a:hover{color:var(--gold2);background:rgba(212,175,55,.07);border-color:var(--line)}
+nav.main a.active{color:#0b0b0b;background:linear-gradient(120deg,var(--gold),var(--gold2));font-weight:600}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{
+  width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  border:1px solid var(--line);background:rgba(255,255,255,.02);transition:.22s;color:var(--muted)
+}
+.icon-btn:hover{color:var(--gold2);border-color:var(--gold);transform:translateY(-2px)}
+.avatar-btn{width:38px;height:38px;border-radius:50%;overflow:hidden;border:1.5px solid var(--gold);
+  display:grid;place-items:center;background:#191c22;font-weight:700;color:var(--gold);font-size:14px}
+.avatar-btn img{width:100%;height:100%;object-fit:cover}
+#burger{display:none}
+
+/* ---------- LAYOUT ---------- */
+.view{display:none;animation:fade .45s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.wrap{max-width:1280px;margin:0 auto;padding:34px 22px 90px}
+h1.page{font-size:34px;letter-spacing:.5px;margin-bottom:6px;
+  background:linear-gradient(120deg,#fff,var(--gold2),var(--gold));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+p.sub{color:var(--muted);font-size:14.5px;margin-bottom:26px;max-width:760px;line-height:1.65}
+
+/* ---------- BREADCRUMBS ---------- */
+.crumbs{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12.5px;
+  color:var(--muted);margin-bottom:16px}
+.crumbs a{color:var(--muted);transition:.2s}
+.crumbs a:hover{color:var(--gold2)}
+.crumbs .sep{opacity:.45}
+.crumbs .cur{color:var(--gold2);font-weight:600}
+
+/* ---------- PORTAL HEADER ---------- */
+.phead{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:22px;
+  border-radius:var(--r);border:1px solid var(--line);position:relative;overflow:hidden;
+  margin-bottom:24px;background:linear-gradient(165deg,var(--card2),var(--card))}
+.phead:before{content:"";position:absolute;inset:0 0 auto 0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.6}
+.phead .pic{width:84px;height:84px;border-radius:18px;background:rgba(0,0,0,.35);
+  display:grid;place-items:center;flex-shrink:0}
+.phead .pinfo{flex:1;min-width:220px}
+
+/* ---------- HERO ---------- */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;
+  min-height:calc(100vh - 64px);max-width:1280px;margin:0 auto;padding:40px 22px}
+.hero h1{font-size:clamp(38px,5.2vw,68px);line-height:1.02;letter-spacing:-1px;font-weight:800}
+.hero h1 em{font-style:normal;display:block;
+  background:linear-gradient(110deg,var(--gold),var(--gold2) 45%,#b8912b);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{color:var(--muted);font-size:16.5px;line-height:1.7;margin:20px 0 28px;max-width:560px}
+.btnrow{display:flex;gap:12px;flex-wrap:wrap}
+.btn{
+  padding:13px 24px;border-radius:12px;font-size:14.5px;font-weight:600;
+  border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--text);transition:.25s
+}
+.btn:hover{transform:translateY(-3px);border-color:var(--gold);color:var(--gold2);
+  box-shadow:0 12px 30px -14px rgba(212,175,55,.7)}
+.btn.gold{background:linear-gradient(120deg,var(--gold),var(--gold2));color:#0c0c0c;border:none}
+.btn.gold:hover{box-shadow:0 14px 34px -12px rgba(212,175,55,.85);color:#0c0c0c}
+.btn.sm{padding:8px 14px;font-size:12.5px;border-radius:9px}
+.btn.danger{border-color:rgba(228,87,46,.5);color:#ff9a78}
+.btn.danger:hover{border-color:#E4572E;color:#ffb69c;box-shadow:none}
+
+/* HERO VISUAL */
+.hero-visual{position:relative;height:520px;perspective:1100px}
+.float-card{
+  position:absolute;background:linear-gradient(160deg,var(--card2),var(--card));
+  border:1px solid var(--line);border-radius:18px;padding:16px 18px;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.02) inset;
+  animation:float 6s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.fc1{top:8%;left:0;width:250px;animation-delay:0s}
+.fc2{top:38%;right:2%;width:230px;animation-delay:1.1s}
+.fc3{bottom:6%;left:8%;width:270px;animation-delay:2.2s}
+.fc4{top:0;right:12%;width:150px;animation-delay:.6s;text-align:center}
+.mini-title{font-size:11px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:9px}
+.mini-big{font-size:26px;font-weight:800;color:var(--gold2)}
+.bar{height:7px;border-radius:6px;background:#23262d;overflow:hidden;margin:7px 0 3px}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .9s}
+.mini-row{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:9px}
+.orb{position:absolute;border-radius:50%;filter:blur(46px);opacity:.5;pointer-events:none}
+.orb.a{width:230px;height:230px;background:#7a5c11;top:-40px;right:-30px}
+.orb.b{width:200px;height:200px;background:#16375e;bottom:-30px;left:-30px}
+.spin-ring{position:absolute;top:50%;left:50%;width:340px;height:340px;margin:-170px 0 0 -170px;
+  border:1px dashed rgba(212,175,55,.22);border-radius:50%;animation:spin 34s linear infinite;pointer-events:none}
+.spin-ring:after{content:"";position:absolute;top:-5px;left:50%;width:10px;height:10px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 18px var(--gold)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- CARDS / GRID ---------- */
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g5{grid-template-columns:repeat(5,1fr)}
+.card{
+  background:linear-gradient(165deg,var(--card2) 0%,var(--card) 100%);
+  border:1px solid rgba(255,255,255,.055);border-radius:var(--r);padding:18px;
+  position:relative;overflow:hidden;transition:.3s
+}
+.card:hover{border-color:var(--line);box-shadow:0 22px 44px -26px rgba(0,0,0,.95)}
+.card:before{content:"";position:absolute;inset:0 0 auto 0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5}
+.tilt{transition:transform .28s cubic-bezier(.2,.7,.3,1),box-shadow .28s;transform-style:preserve-3d;will-change:transform}
+
+.subj-card{cursor:pointer;display:flex;flex-direction:column;gap:12px}
+.subj-card .art{height:120px;border-radius:12px;position:relative;overflow:hidden;
+  display:grid;place-items:center;border:1px solid rgba(255,255,255,.06)}
+.subj-card .art svg{width:78px;height:78px;opacity:.95}
+.subj-card h3{font-size:17px;letter-spacing:.3px}
+.subj-card .meta{font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+.pct{font-weight:800;color:var(--gold2);font-size:13px}
+
+/* category card */
+.cat{cursor:pointer;display:flex;flex-direction:column;gap:10px;padding:20px}
+.cat .ic{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.25);flex-shrink:0}
+.cat h3{font-size:16px;letter-spacing:.2px}
+.cat p{font-size:12.5px;color:var(--muted);line-height:1.6}
+.cat .catmeta{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--muted);margin-top:auto}
+
+/* ---------- CHAPTER CARDS ---------- */
+.chapter{display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden}
+.poster{height:112px;position:relative;display:flex;align-items:flex-end;padding:12px 14px;overflow:hidden}
+.poster .num{position:absolute;top:10px;right:14px;font-size:34px;font-weight:900;
+  color:rgba(255,255,255,.10);letter-spacing:-1px}
+.poster .badge{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;
+  background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.16);padding:4px 9px;border-radius:20px;
+  backdrop-filter:blur(4px)}
+.poster svg.deco{position:absolute;right:-14px;bottom:-18px;width:130px;height:130px;opacity:.30}
+.ch-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:11px;flex:1}
+.ch-body h4{font-size:14.5px;line-height:1.35;min-height:39px}
+.status{font-size:10.5px;letter-spacing:1.1px;text-transform:uppercase;padding:4px 9px;border-radius:20px;
+  border:1px solid var(--line);color:var(--muted);align-self:flex-start}
+.status.progress{color:#ffcf6b;border-color:rgba(255,207,107,.4);background:rgba(255,207,107,.08)}
+.status.finished{color:#5fe0a8;border-color:rgba(95,224,168,.4);background:rgba(95,224,168,.08)}
+.status.revised{color:#8fc0ff;border-color:rgba(143,192,255,.4);background:rgba(143,192,255,.08)}
+.ch-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto}
+.chk{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none}
+.chk input{width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
+.ts{font-size:11px;color:#6f7480;line-height:1.6;word-break:break-word}
+
+/* ---------- TOOLBAR ---------- */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+.field{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:11px;
+  padding:10px 14px;color:var(--text);font-size:13.5px;outline:none;transition:.2s;min-width:180px}
+.field:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.10)}
+select.field{cursor:pointer}
+select.field option{background:#15181D}
+textarea.field{min-height:110px;resize:vertical;width:100%;line-height:1.6}
+
+/* ---------- TABS ---------- */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;
+  border-bottom:1px solid var(--line);padding-bottom:12px}
+.tab{padding:9px 15px;border-radius:10px;font-size:13px;color:var(--muted);
+  border:1px solid transparent;transition:.22s;cursor:pointer}
+.tab:hover{color:var(--gold2);background:rgba(212,175,55,.06)}
+.tab.active{color:#0b0b0b;background:linear-gradient(120deg,var(--gold),var(--gold2));font-weight:600}
+
+/* ---------- TABLES ---------- */
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.015)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th,td{padding:11px 13px;text-align:left;border-bottom:1px solid rgba(255,255,255,.05)}
+th{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold2);
+  background:rgba(212,175,55,.05);font-weight:600}
+tbody tr:hover{background:rgba(212,175,55,.035)}
+td.c,th.c{text-align:center}
+
+/* ---------- CHARTS ---------- */
+.chart{display:flex;flex-direction:column;gap:11px;margin:6px 0 18px}
+.crow{display:grid;grid-template-columns:190px 1fr 56px;gap:12px;align-items:center;font-size:12.5px}
+.crow .lab{color:var(--muted);line-height:1.3}
+.ctrack{height:26px;background:#1b1e24;border-radius:8px;overflow:hidden;position:relative;
+  border:1px solid rgba(255,255,255,.05)}
+.ctrack i{display:block;height:100%;border-radius:7px;transition:width 1s cubic-bezier(.2,.8,.3,1);
+  background:linear-gradient(90deg,rgba(212,175,55,.55),var(--gold),var(--gold2));
+  box-shadow:0 0 18px -4px rgba(212,175,55,.6) inset}
+.crow .val{text-align:right;font-weight:700;color:var(--gold2)}
+.crow:hover .ctrack{border-color:var(--gold)}
+
+/* ---------- PYQ COLLAPSIBLE ---------- */
+.pyq-ch{border:1px solid rgba(255,255,255,.06);border-radius:12px;background:rgba(255,255,255,.015);
+  margin-bottom:9px;overflow:hidden;transition:.2s}
+.pyq-ch:hover{border-color:var(--line)}
+.pyq-ch summary{list-style:none;cursor:pointer;padding:13px 15px;display:flex;align-items:center;
+  gap:12px;justify-content:space-between;transition:.2s}
+.pyq-ch summary::-webkit-details-marker{display:none}
+.pyq-ch summary:hover{background:rgba(212,175,55,.05)}
+.pyq-ch[open] summary{border-bottom:1px solid rgba(255,255,255,.05)}
+.pyq-ch .nm{font-size:13.5px;flex:1;line-height:1.4}
+.pyq-years{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;padding:14px 15px}
+.pyq-y{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);
+  border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:7px 9px;cursor:pointer;transition:.2s}
+.pyq-y:hover{border-color:var(--line);color:var(--gold2)}
+.pyq-y input{accent-color:var(--gold);cursor:pointer}
+.pyq-pill{font-size:11px;color:var(--muted);white-space:nowrap;
+  border:1px solid var(--line);border-radius:20px;padding:3px 9px;background:rgba(212,175,55,.05)}
+
+/* ---------- FOCUS MODE ---------- */
+.timer{font-size:clamp(46px,10vw,84px);font-weight:800;letter-spacing:-2px;color:var(--gold2);
+  font-variant-numeric:tabular-nums;line-height:1;text-align:center}
+.timer.warn{color:#ffcf6b}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:9px 16px;border-radius:20px;border:1px solid var(--line);font-size:12.5px;
+  color:var(--muted);transition:.2s;cursor:pointer;background:rgba(255,255,255,.02)}
+.chip:hover{border-color:var(--gold);color:var(--gold2)}
+.chip.on{background:linear-gradient(120deg,var(--gold),var(--gold2));color:#0b0b0b;
+  border-color:transparent;font-weight:600}
+
+/* ---------- CALENDAR ---------- */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:14px}
+.cal-grid .dow{text-align:center;font-size:10.5px;letter-spacing:1.2px;color:var(--muted);
+  text-transform:uppercase;padding:6px 0}
+.cal-day{min-height:78px;border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:7px;
+  background:rgba(255,255,255,.015);cursor:pointer;transition:.2s;font-size:11px}
+.cal-day:hover{border-color:var(--gold);background:rgba(212,175,55,.05)}
+.cal-day.empty{opacity:.18;cursor:default;background:none}
+.cal-day.empty:hover{border-color:rgba(255,255,255,.05);background:none}
+.cal-day.today{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,175,55,.18) inset}
+.cal-day b{display:block;font-size:12.5px;color:var(--gold2);margin-bottom:3px}
+.ev{font-size:10px;background:rgba(212,175,55,.14);border-left:2px solid var(--gold);
+  padding:2px 5px;border-radius:4px;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ev.done{opacity:.45;text-decoration:line-through}
+
+/* ---------- MODAL ---------- */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;z-index:300;padding:20px}
+.overlay.on{display:flex;animation:fade .25s}
+.modal{background:linear-gradient(165deg,var(--card2),var(--card));border:1px solid var(--line);
+  border-radius:18px;padding:24px;max-width:560px;width:100%;max-height:88vh;overflow:auto;
+  box-shadow:0 40px 90px -40px #000}
+.modal h3{margin-bottom:16px;font-size:19px;color:var(--gold2)}
+.modal label{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;letter-spacing:.6px}
+.modal .field{width:100%}
+.mrow{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
+
+/* ---------- SEARCH ---------- */
+#searchOverlay .modal{max-width:680px}
+.sres{max-height:52vh;overflow:auto;margin-top:14px}
+.sres a{display:block;padding:11px 13px;border-radius:10px;border:1px solid transparent;transition:.18s}
+.sres a:hover{background:rgba(212,175,55,.07);border-color:var(--line)}
+.sres a b{display:block;font-size:13.5px;margin-bottom:3px}
+.sres a span{font-size:11.5px;color:var(--muted)}
+
+/* ---------- MISC ---------- */
+.note{background:rgba(212,175,55,.06);border:1px solid var(--line);border-left:3px solid var(--gold);
+  border-radius:10px;padding:13px 16px;font-size:12.5px;color:#cfd3da;line-height:1.65;margin:16px 0}
+.empty{text-align:center;padding:44px 20px;color:var(--muted);font-size:13.5px;
+  border:1px dashed rgba(212,175,55,.22);border-radius:14px}
+.tag{display:inline-block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;
+  padding:4px 9px;border-radius:20px;border:1px solid var(--line);color:var(--gold2);
+  background:rgba(212,175,55,.06);margin-bottom:10px}
+.stat{display:flex;flex-direction:column;gap:5px}
+.stat b{font-size:27px;font-weight:800;color:var(--gold2);letter-spacing:-.5px}
+.stat span{font-size:11.5px;color:var(--muted);letter-spacing:.9px;text-transform:uppercase}
+.cstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:14px}
+.cd{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:520px}
+.cd div{background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:14px;
+  padding:15px 8px;text-align:center}
+.cd b{display:block;font-size:29px;font-weight:800;color:var(--gold2);letter-spacing:-1px}
+.cd span{font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase}
+.folder-item{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:12px 14px;border:1px solid rgba(255,255,255,.05);border-radius:12px;
+  background:rgba(255,255,255,.015);margin-bottom:9px;transition:.2s}
+.folder-item:hover{border-color:var(--line)}
+.author-card{padding:15px}
+.author-card h4{font-size:14px;margin-bottom:5px;color:var(--gold2)}
+.author-card p{font-size:12px;color:var(--muted);line-height:1.6}
+.cl{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.cl .cl-info{flex:1;min-width:220px}
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(90px);
+  background:linear-gradient(120deg,var(--gold),var(--gold2));color:#0b0b0b;font-weight:700;
+  padding:12px 24px;border-radius:12px;font-size:13px;z-index:500;transition:.35s;opacity:0}
+#toast.on{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:1080px){
+  .g5,.g4{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(2,1fr)}
+  .hero{grid-template-columns:1fr;min-height:auto;padding-top:34px}
+  .hero-visual{height:420px}
+}
+@media(max-width:820px){
+  nav.main{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;
+    background:rgba(10,11,14,.98);border-bottom:1px solid var(--line);padding:12px;gap:2px}
+  nav.main.open{display:flex}
+  #burger{display:grid}
+  .g2,.g3,.g4,.g5{grid-template-columns:1fr}
+  .cd{grid-template-columns:repeat(2,1fr)}
+  .crow{grid-template-columns:110px 1fr 46px;font-size:11.5px}
+  .wrap{padding:24px 15px 90px}
+  .hero h1{font-size:38px}
+  .fc1,.fc2,.fc3{position:relative;width:100%;left:auto;right:auto;top:auto;bottom:auto;margin-bottom:12px}
+  .hero-visual{height:auto;display:flex;flex-direction:column}
+  .spin-ring,.orb{display:none}
+  .phead .pic{width:64px;height:64px}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+}
+body.rm *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+body.compact .wrap{padding-top:18px}
+body.compact .card{padding:13px}
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <a class="brand" href="#/home">
+    <svg viewBox="0 0 64 64" aria-label="M-Board logo">
+      <defs>
+        <linearGradient id="gld" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#D4AF37"/><stop offset=".5" stop-color="#F5D76E"/><stop offset="1" stop-color="#B8912B"/>
+        </linearGradient>
+      </defs>
+      <path d="M32 3 58 14v20c0 14-11 23-26 27C17 57 6 48 6 34V14Z" fill="none" stroke="url(#gld)" stroke-width="2"/>
+      <path d="M32 9 52 17.5V34c0 11-8.6 18.2-20 21.6C20.6 52.2 12 45 12 34V17.5Z" fill="rgba(212,175,55,.07)"/>
+      <path d="M19 43V22l13 12 13-12v21" fill="none" stroke="url(#gld)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="brand-txt"><b>M-BOARD</b><span>YOUR BOARDS. YOUR MISSION.</span></span>
+  </a>
+
+  <nav class="main" id="mainNav">
+    <a href="#/home">Home</a>
+    <a href="#/dashboard">Dashboard</a>
+    <a href="#/subjects">Subjects</a>
+    <a href="#/practicals">Practicals</a>
+    <a href="#/pyq">PYQ</a>
+    <a href="#/weightage">Weightage</a>
+    <a href="#/calendar">Calendar</a>
+  </nav>
+
+  <div class="hdr-right">
+    <button class="icon-btn" id="btnSearch" title="Search">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+    <a class="icon-btn" href="#/calendar" title="Calendar">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+    </a>
+    <button class="avatar-btn" id="avatarBtn" title="Profile">
+      <span id="avatarTxt">M</span>
+    </button>
+    <a class="icon-btn" href="#/settings" title="Settings">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </a>
+    <button class="icon-btn" id="burger" title="Menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ================= HOME ================= -->
+<section class="view active" id="v-home">
+  <div class="hero">
+    <div>
+      <span class="tag">CBSE Class 12 · Session 2026–27</span>
+      <h1>Your Boards.<em>Your Mission.</em></h1>
+      <p class="lead">Everything for your CBSE Class 12 preparation — lectures, revision, PYQs, practicals and progress tracking in one place. Each subject opens its own clean portal.</p>
+      <div class="btnrow">
+        <button class="btn gold" onclick="go('#/dashboard')">Enter Dashboard</button>
+        <button class="btn" onclick="go('#/subjects')">Explore Subjects</button>
+        <button class="btn" onclick="go('#/pyq')">PYQ Tracker</button>
+      </div>
+      <div style="margin-top:34px">
+        <div class="mini-title">Board Exam Countdown</div>
+        <div class="cd" id="homeCd">
+          <div><b id="cdD">--</b><span>Days</span></div>
+          <div><b id="cdH">--</b><span>Hours</span></div>
+          <div><b id="cdM">--</b><span>Minutes</span></div>
+          <div><b id="cdS">--</b><span>Seconds</span></div>
+        </div>
+        <div class="ts" id="cdLabel" style="margin-top:9px"></div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="orb a"></div><div class="orb b"></div>
+      <div class="spin-ring"></div>
+      <div class="float-card fc1 tilt">
+        <div class="mini-title">Physics</div>
+        <div class="mini-big" id="hvPhy">0%</div>
+        <div class="bar"><i id="hvPhyBar" style="width:0%"></i></div>
+        <div class="mini-row"><span>Chapters</span><span id="hvPhyTxt">0 / 13</span></div>
+      </div>
+      <div class="float-card fc2 tilt">
+        <div class="mini-title">Chemistry</div>
+        <div class="mini-big" id="hvChem">0%</div>
+        <div class="bar"><i id="hvChemBar" style="width:0%"></i></div>
+        <div class="mini-row"><span>Chapters</span><span id="hvChemTxt">0 / 10</span></div>
+      </div>
+      <div class="float-card fc3 tilt">
+        <div class="mini-title">Mathematics · Calculus Weightage</div>
+        <div class="bar" style="height:12px"><i style="width:44%"></i></div>
+        <div class="mini-row"><span>35 / 80 marks</span><span>Unit-level</span></div>
+        <div class="mini-title" style="margin-top:14px">Overall Progress</div>
+        <div class="mini-big" id="hvAll">0%</div>
+      </div>
+      <div class="float-card fc4 tilt">
+        <svg width="60" height="60" viewBox="0 0 64 64" fill="none" stroke="#D4AF37" stroke-width="2.6" stroke-linecap="round">
+          <path d="M14 46V20l18 14 18-14v26"/>
+        </svg>
+        <div class="mini-title" style="margin-top:8px">M-Board</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DASHBOARD ================= -->
+<section class="view" id="v-dashboard">
+  <div class="wrap">
+    <div class="crumbs"><span class="cur">Dashboard</span></div>
+    <h1 class="page">Dashboard</h1>
+    <p class="sub">Your study command centre — just the essentials. Detailed chapters, checklists and tables live inside their own portals.</p>
+
+    <div class="grid g2" style="margin-bottom:20px">
+      <div class="card">
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+          <div class="avatar-btn" style="width:60px;height:60px;font-size:22px" id="dashAvatar"><span>M</span></div>
+          <div>
+            <div class="mini-title">Welcome back</div>
+            <div style="font-size:21px;font-weight:800" id="dashName">Student</div>
+            <div class="ts" id="dashDate"></div>
+          </div>
+        </div>
+        <div style="margin-top:18px" class="mini-title">Daily study goal</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="bar" style="flex:1"><i id="goalBar" style="width:0%"></i></div>
+          <span class="pct" id="goalTxt">0 / 4 lectures</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="mini-title">Countdown</div>
+        <div class="cd" id="dashCd" style="max-width:100%">
+          <div><b id="dCdD">--</b><span>Days</span></div>
+          <div><b id="dCdH">--</b><span>Hrs</span></div>
+          <div><b id="dCdM">--</b><span>Min</span></div>
+          <div><b id="dCdS">--</b><span>Sec</span></div>
+        </div>
+        <div class="ts" id="dCdLabel" style="margin-top:10px"></div>
+      </div>
+    </div>
+
+    <div class="card" id="continueCard" style="margin-bottom:20px"></div>
+
+    <div class="mini-title" style="margin:26px 0 12px">Subjects</div>
+    <div class="grid g5" id="dashSubjects"></div>
+
+    <div class="grid g2" style="margin-top:26px">
+      <div class="card">
+        <div class="mini-title">Statistics</div>
+        <div class="cstats" id="dashStats"></div>
+      </div>
+      <div class="card">
+        <div class="mini-title">Today &amp; upcoming</div>
+        <div id="dashEvents"></div>
+      </div>
+    </div>
+
+    <div class="grid g2" style="margin-top:20px">
+      <div class="card"><div class="mini-title">Recently started</div><div id="recentStart" class="ts"></div></div>
+      <div class="card"><div class="mini-title">Recently completed</div><div id="recentDone" class="ts"></div></div>
+    </div>
+
+    <div class="mini-title" style="margin:30px 0 12px">Portals</div>
+    <div class="btnrow" id="quickActions"></div>
+  </div>
+</section>
+
+<!-- ================= SUBJECTS LIST ================= -->
+<section class="view" id="v-subjects">
+  <div class="wrap">
+    <div class="crumbs"><a href="#/dashboard">Dashboard</a><span class="sep">›</span><span class="cur">Subjects</span></div>
+    <h1 class="page">Subjects</h1>
+    <p class="sub">Five full portals with one-shot lectures, chapter tracking, PYQ checklists and weightage. Open one subject at a time.</p>
+    <div class="grid g3" id="subjectList"></div>
+    <div class="mini-title" style="margin:34px 0 12px">Special Portals</div>
+    <div class="grid g3" id="specialList"></div>
+  </div>
+</section>
+
+<!-- ================= SUBJECT PORTAL (dynamic) ================= -->
+<section class="view" id="v-subject">
+  <div class="wrap" id="subjectPortal"></div>
+</section>
+
+<!-- ================= ADVANCED CHEMISTRY (dynamic) ================= -->
+<section class="view" id="v-advanced">
+  <div class="wrap" id="advancedPortal"></div>
+</section>
+
+<!-- ================= ENGLISH PORTAL (dynamic) ================= -->
+<section class="view" id="v-english">
+  <div class="wrap" id="englishPortal"></div>
+</section>
+
+<!-- ================= REVISION (dynamic) ================= -->
+<section class="view" id="v-revision">
+  <div class="wrap" id="revisionGrid"></div>
+</section>
+
+<!-- ================= ADVANCE PUSH (dynamic) ================= -->
+<section class="view" id="v-advance">
+  <div class="wrap" id="advanceGrid"></div>
+</section>
+
+<!-- ================= SAMPLE PAPER ANALYSIS (dynamic) ================= -->
+<section class="view" id="v-analysis">
+  <div class="wrap" id="analysisGrid"></div>
+</section>
+
+<!-- ================= PRACTICALS (dynamic) ================= -->
+<section class="view" id="v-practicals">
+  <div class="wrap" id="pracBody"></div>
+</section>
+
+<!-- ================= WEIGHTAGE (dynamic) ================= -->
+<section class="view" id="v-weightage">
+  <div class="wrap" id="wBody"></div>
+</section>
+
+<!-- ================= PYQ (dynamic) ================= -->
+<section class="view" id="v-pyq">
+  <div class="wrap" id="pyqBody"></div>
+</section>
+
+<!-- ================= CALENDAR ================= -->
+<section class="view" id="v-calendar">
+  <div class="wrap">
+    <div class="crumbs"><a href="#/dashboard">Dashboard</a><span class="sep">›</span><span class="cur">Calendar</span></div>
+    <h1 class="page">Calendar</h1>
+    <p class="sub">Plan chapters, revision, tests and practicals. Events appear on the dashboard.</p>
+    <div class="toolbar">
+      <button class="btn sm" id="calPrev">‹ Prev</button>
+      <button class="btn sm" id="calToday">Today</button>
+      <button class="btn sm" id="calNext">Next ›</button>
+      <b id="calTitle" style="margin-left:8px;font-size:16px;color:var(--gold2)"></b>
+      <button class="btn gold sm" style="margin-left:auto" id="calAdd">+ Add Event</button>
+    </div>
+    <div class="card">
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div class="mini-title" style="margin:26px 0 12px">Upcoming events</div>
+    <div id="calUpcoming"></div>
+  </div>
+</section>
+
+<!-- ================= FOLDERS ================= -->
+<section class="view" id="v-folders">
+  <div class="wrap">
+    <div class="crumbs"><a href="#/dashboard">Dashboard</a><span class="sep">›</span><span class="cur">My Folders</span></div>
+    <h1 class="page">My Folders</h1>
+    <p class="sub">A local study organiser. Deleting a folder removes only the folder and its associations — never the source chapter or video.</p>
+    <div class="toolbar">
+      <button class="btn gold sm" id="folderAdd">+ Create Folder</button>
+      <input class="field" id="folderSearch" placeholder="Search folders…">
+    </div>
+    <div class="grid g3" id="folderGrid"></div>
+  </div>
+</section>
+
+<!-- ================= FOCUS MODE ================= -->
+<section class="view" id="v-focus">
+  <div class="wrap">
+    <div class="crumbs"><a href="#/dashboard">Dashboard</a><span class="sep">›</span><span class="cur">Focus Mode</span></div>
+    <h1 class="page">Focus Mode</h1>
+    <p class="sub">A simple study timer. Elapsed time is measured from the real system clock, so pausing or switching tabs never corrupts the recorded duration. Wall-clock time is not the same as attention or lecture-watch time — you can end a session manually at any point.</p>
+    <div id="focusBody"></div>
+  </div>
+</section>
+
+<!-- ================= SETTINGS ================= -->
+<section class="view" id="v-settings">
+  <div class="wrap">
+    <div class="crumbs"><a href="#/dashboard">Dashboard</a><span class="sep">›</span><span class="cur">Settings</span></div>
+    <h1 class="page">Settings</h1>
+    <p class="sub">Profile, appearance, countdown, study preferences and backup.</p>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="tag">Profile</span>
+        <label class="mini-title">Display name</label>
+        <input class="field" id="setName" placeholder="Your name" style="width:100%">
+        <label class="mini-title" style="display:block;margin-top:12px">Username</label>
+        <input class="field" id="setUser" placeholder="username" style="width:100%">
+        <div class="btnrow" style="margin-top:16px">
+          <button class="btn gold sm" id="btnSaveProfile">Save Profile</button>
+          <button class="btn sm" id="btnPickPhoto">Choose Photo</button>
+          <button class="btn sm danger" id="btnClearPhoto">Remove Photo</button>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" hidden>
+      </div>
+
+      <div class="card">
+        <span class="tag">Appearance</span>
+        <label class="chk"><input type="checkbox" id="setMotion"> Reduced motion</label>
+        <label class="chk" style="margin-top:10px"><input type="checkbox" id="setCompact"> Compact spacing</label>
+        <span class="tag" style="margin-top:20px">Study preferences</span>
+        <label class="mini-title">Daily study target (lectures)</label>
+        <input class="field" type="number" min="1" max="20" id="setGoal" style="width:100%">
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <span class="tag">Countdown</span>
+      <div id="cdList"></div>
+      <div class="grid g2" style="margin-top:14px">
+        <div>
+          <label class="mini-title">Name</label>
+          <input class="field" id="cdName" placeholder="e.g. Boards" style="width:100%">
+        </div>
+        <div>
+          <label class="mini-title">Target date &amp; time</label>
+          <input class="field" type="datetime-local" id="cdDate" style="width:100%">
+        </div>
+      </div>
+      <div class="btnrow" style="margin-top:14px">
+        <button class="btn gold sm" id="cdAdd">Save Countdown</button>
+        <button class="btn sm" id="cdReset">Restore Default (1 Feb 2027)</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <span class="tag">Backup</span>
+      <p class="ts" style="margin-bottom:14px">Export your progress, focus sessions, calendar, folders, notes and settings as a JSON file. Import validates the file before changing anything.</p>
+      <div class="btnrow">
+        <button class="btn gold sm" id="btnExport">Export JSON</button>
+        <button class="btn sm" id="btnImport">Import JSON</button>
+        <button class="btn sm danger" id="btnResetAll">Reset All Data</button>
+      </div>
+      <input type="file" id="importInput" accept="application/json,.json" hidden>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <span class="tag">About Creator</span>
+      <div style="display:flex;gap:16px;align-items:center">
+        <svg width="52" height="52" viewBox="0 0 64 64" fill="none" stroke="#D4AF37" stroke-width="2.6" stroke-linecap="round">
+          <path d="M14 46V20l18 14 18-14v26"/>
+        </svg>
+        <div>
+          <div style="font-size:19px;font-weight:800;color:var(--gold2)">Divyanshu Mishra</div>
+          <p class="ts">Creator of M-Board — a single-file, offline-first study dashboard built to bring lectures, revision, PYQ tracking and progress together for CBSE Class 12 students.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <span class="tag">Study Helper (Non-AI)</span>
+      <p class="ts">This is a simple local search helper. It searches the catalogue stored inside this file. It is <b>not</b> an AI and does not generate live responses.</p>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <input class="field" id="helperInput" placeholder="Search lectures, chapters, subjects…" style="flex:1;min-width:220px">
+        <button class="btn gold sm" id="helperBtn">Search Catalogue</button>
+      </div>
+      <div class="sres" id="helperRes"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OVERLAYS ================= -->
+<div class="overlay" id="searchOverlay">
+  <div class="modal">
+    <h3>Global Search</h3>
+    <input class="field" id="globalSearch" placeholder="Search subjects, chapters, portals…" style="width:100%">
+    <div class="sres" id="globalRes"></div>
+    <div class="mrow"><button class="btn sm" onclick="closeOverlay('searchOverlay')">Close</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="modalOverlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<div class="overlay" id="profileOverlay">
+  <div class="modal">
+    <h3>Profile Setup</h3>
+    <p class="ts" style="margin-bottom:10px">Optional — you can skip this and set it later in Settings.</p>
+    <label class="mini-title">Display name</label>
+    <input class="field" id="pName" placeholder="Your name" style="width:100%">
+    <label class="mini-title" style="display:block;margin-top:12px">Username</label>
+    <input class="field" id="pUser" placeholder="username" style="width:100%">
+    <div class="btnrow" style="margin-top:12px">
+      <button class="btn sm" id="pPhotoBtn">Choose Photo</button>
+      <span class="ts" id="pPhotoTxt">No photo selected</span>
+    </div>
+    <input type="file" id="pPhotoInput" accept="image/*" hidden>
+    <div class="mrow">
+      <button class="btn sm" onclick="closeOverlay('profileOverlay')">Skip</button>
+      <button class="btn gold sm" id="pSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ==================================================================
+   M-BOARD — single file application
+   Refined: portal separation, reduced dashboard density,
+   removed broken PDF sample-paper library,
+   added Continue Learning and Focus Mode.
+   ================================================================== */
+
+/* ------------------ 1. DATA ------------------ */
+const SUBJECTS = {
+  physics:{
+    key:'physics', name:'Physics', accent:'#4D9FFF', icon:'atom',
+    desc:'Electricity, magnetism, optics, modern physics and semiconductors.',
+    chapters:[
+      {id:'phy1',n:'Electric Charges and Fields',u:'https://youtu.be/i_yT6CpUOTk'},
+      {id:'phy2',n:'Electrostatics Potential and Capacitance',u:'https://youtu.be/5Wj95zTraZI'},
+      {id:'phy3',n:'Current Electricity',u:'https://youtu.be/ANz7YYAZzrM'},
+      {id:'phy4',n:'Moving Charge and Magnetism',u:'https://www.youtube.com/live/sXq12-OXeLA?si=gBPtUe9a9HfOHhZ_'},
+      {id:'phy5',n:'Electromagnetic Induction',u:'https://www.youtube.com/live/xt7X22rEigA?si=Ytr-2yRRiXKgYkXA'},
+      {id:'phy6',n:'Alternating Current',u:'https://youtu.be/jZeRVBO0ymI'},
+      {id:'phy7',n:'Magnetism and Matter',u:'https://www.youtube.com/live/6HPg4eaMev0?si=nx5tZUg97M9jyUyA'},
+      {id:'phy8',n:'Electromagnetic Waves',u:'https://www.youtube.com/live/FjfiSMFXQeU?si=nWqWADAqeT0huDou'},
+      {id:'phy9',n:'Ray Optics',u:'https://youtu.be/ovfNP_TqolM'},
+      {id:'phy10',n:'Wave Optics',u:'https://youtu.be/2gumHdFXums'},
+      {id:'phy11',n:'Semiconductor Electronics',u:'https://youtu.be/03PgdzPn-XE'},
+      {id:'phy12',n:'Dual Nature',u:'https://www.youtube.com/live/qj0AeF2tQCc?si=THplNbnQN_uapAK_'},
+      {id:'phy13',n:'Atoms and Nuclei (Combined Lecture)',u:'https://www.youtube.com/live/YoS4A9hCCMY?si=Sy0X4xxrC9ZB26Lf'}
+    ]
+  },
+  chemistry:{
+    key:'chemistry', name:'Chemistry', accent:'#2ED39B', icon:'flask',
+    desc:'Physical, inorganic and organic chemistry with an Advanced Chemistry portal.',
+    chapters:[
+      {id:'che1',n:'Solutions',u:'https://youtu.be/MrQ5dvvNuVs'},
+      {id:'che2',n:'Electrochemistry',u:'https://youtu.be/PC1u_KkEEL4'},
+      {id:'che3',n:'Chemical Kinetics',u:'https://youtu.be/TJrnf7Woh9k'},
+      {id:'che4',n:'Coordination Compounds',u:'https://www.youtube.com/live/CEgPURYTIg4?si=B0az7kLDrmXkNT3a'},
+      {id:'che5',n:'d- and f-Block Elements',u:'https://www.youtube.com/live/blH7lNQ_rKg?si=ttnnLMHpxGfLvlDG'},
+      {id:'che6',n:'Haloalkanes and Haloarenes',u:'https://youtu.be/WHo2rNLDKUU'},
+      {id:'che7',n:'Alcohols, Phenols and Ethers',u:'https://youtu.be/dN7-7GyTA9o'},
+      {id:'che8',n:'Aldehydes, Ketones and Carboxylic Acids',u:'https://youtu.be/HB8CZzDnKHI'},
+      {id:'che9',n:'Amines',u:'https://youtu.be/lQbgRJnVShY'},
+      {id:'che10',n:'Biomolecules',u:'https://youtu.be/9redLLL_Lcc'}
+    ]
+  },
+  maths:{
+    key:'maths', name:'Mathematics', accent:'#A97BFF', icon:'sigma',
+    desc:'Algebra, calculus, vectors, 3D geometry, LPP and probability.',
+    chapters:[
+      {id:'mat1',n:'Determinants',u:'https://youtu.be/pafeee3O6u8'},
+      {id:'mat2',n:'Matrices',u:'https://youtu.be/2zHpum8F5RA'},
+      {id:'mat3',n:'Relation and Function',u:'https://youtu.be/a8YasMSWFvc'},
+      {id:'mat4',n:'Inverse Trigonometry',u:'https://youtu.be/4Aml6yd4tDY'},
+      {id:'mat5',n:'Continuity and Differentiability',u:'https://youtu.be/cIxHoVCUN1M'},
+      {id:'mat6',n:'Application of Derivatives',u:'https://youtu.be/uVEOu40lYEY'},
+      {id:'mat7',n:'Integrals',u:'https://youtu.be/dBglfhVX6kI'},
+      {id:'mat8',n:'Application of Integrals',u:'https://youtu.be/-tcuZsZqXZk'},
+      {id:'mat9',n:'Differential Equations',u:'https://youtu.be/EEudvNSWzXE'},
+      {id:'mat10',n:'Vector Algebra',u:'https://youtu.be/B5Rq-af5R14'},
+      {id:'mat11',n:'Three-Dimensional Geometry',u:'https://youtu.be/7ggiHx1dEok'},
+      {id:'mat12',n:'Linear Programming',u:'https://youtu.be/98ngGuFd9Vg'},
+      {id:'mat13',n:'Probability',u:'https://youtu.be/_YJr2t_1NTU'}
+    ]
+  },
+  english:{
+    key:'english', name:'English Core', accent:'#E7C97A', icon:'book',
+    desc:'Flamingo, Vistas, poetry, grammar, writing skills and ALS preparation.',
+    chapters:[
+      {id:'eng-last',n:'The Last Lesson',u:'https://youtu.be/G9EEwMHSo7Y'},
+      {id:'eng-lost',n:'Lost Spring',u:'https://youtu.be/wcmk4H05le4'},
+      {id:'eng-deep',n:'Deep Water',u:'https://youtu.be/Yw2YlZDNpb0'},
+      {id:'eng-rat',n:'The Rattrap',u:'https://youtu.be/XwoE0vR8qes'},
+      {id:'eng-ind',n:'Indigo',u:'https://youtu.be/jiQn2mAdZKY'},
+      {id:'eng-poet',n:'Poets and Pancakes',u:'https://youtu.be/-_QUxyfoAhU'},
+      {id:'eng-int',n:'The Interview',u:'https://youtu.be/WhOigJNWSRM'},
+      {id:'eng-go',n:'Going Places',u:'https://youtu.be/wK7bu5YTRgM'},
+      {id:'eng-mom',n:'My Mother at Sixty-Six',u:'https://youtu.be/yTz0qfIqqTs'},
+      {id:'eng-quiet',n:'Keeping Quiet',u:'https://youtu.be/SHGayrunu4M'},
+      {id:'eng-thing',n:'A Thing of Beauty',u:'https://youtu.be/-m29uGoRzfo'},
+      {id:'eng-road',n:'A Roadside Stand',u:'https://youtu.be/JY8tT8_MZJs'},
+      {id:'eng-aunt',n:"Aunt Jennifer's Tigers",u:'https://youtu.be/y-zIFDtcR3k'},
+      {id:'eng-third',n:'The Third Level',u:'https://youtu.be/wYYUavf066g'},
+      {id:'eng-tiger',n:'The Tiger King',u:'https://youtu.be/9oN7zB340m4'},
+      {id:'eng-journey',n:'Journey to the End of the Earth',u:'https://youtu.be/t6Kv1onPqH0'},
+      {id:'eng-enemy',n:'The Enemy',u:'https://youtu.be/kuzPX-r5qxw'},
+      {id:'eng-face',n:'On the Face of It',u:'https://youtu.be/v_wgZ16JJ5M'},
+      {id:'eng-mem',n:'Memories of Childhood',u:'https://youtu.be/j2-2mC1sHh0'}
+    ]
+  },
+  pe:{
+    key:'pe', name:'Physical Education', accent:'#E4572E', icon:'run',
+    desc:'Sports management, yoga, nutrition, biomechanics, psychology and training.',
+    chapters:[
+      {id:'pe1',n:'Management of Sporting Events',u:'https://youtu.be/oOQlTPCjHyc'},
+      {id:'pe2',n:'Children and Women in Sports',u:'https://youtu.be/_AhNBAjbYNI'},
+      {id:'pe3',n:'Yoga as Preventive Measure for Lifestyle Disease',u:'https://youtu.be/QlDOo4AEu7o'},
+      {id:'pe4',n:'Physical Education and Sports for CWSN',u:'https://youtu.be/xDrvCGbGvok'},
+      {id:'pe5',n:'Sports and Nutrition',u:'https://youtu.be/5_dB_wETsNs'},
+      {id:'pe6',n:'Test and Measurement in Sports',u:'https://youtu.be/PFDIcpe9I9Y'},
+      {id:'pe7',n:'Physiology and Injuries in Sports',u:'https://youtu.be/f3ooYobT-ZE'},
+      {id:'pe8',n:'Biomechanics and Sports',u:'https://youtu.be/nZDjbciZtGY'},
+      {id:'pe9',n:'Psychology and Sports',u:'https://youtu.be/13e-sMhxf9k'},
+      {id:'pe10',n:'Training in Sports',u:'https://youtu.be/fMIBtQ9WLUI'}
+    ],
+    featured:{id:'pe-all',n:'Physical Education — All in One',u:'https://youtu.be/7r3I6l_azOQ'}
+  }
+};
+
+/* Advanced Chemistry — URLs preserved exactly. Chapters added for the category pages. */
+const ADV_CHEM = [
+  {id:'adv-phys', n:'Physical Chemistry', cat:'physical',
+   u:'https://www.youtube.com/live/ip6sNvps2Ew?si=8xIbQRc8c0QY1RL5',
+   d:'Solutions, electrochemistry and chemical kinetics — numerical-heavy advanced revision.',
+   chapters:['che1','che2','che3']},
+  {id:'adv-inorg', n:'Inorganic Chemistry', cat:'inorganic',
+   u:'https://www.youtube.com/live/Rai8dGtRgZc?si=0M_FDjKWiPRN0Nh5',
+   d:'d- and f-block elements, coordination compounds, periodicity and trends.',
+   chapters:['che4','che5']},
+  {id:'adv-org', n:'Organic Chemistry', cat:'organic',
+   u:'https://www.youtube.com/live/xDdZcBH2Vh0?si=qoIQIscjN5VHyW3S',
+   d:'Reaction mechanisms, named reactions and conversion practice.',
+   chapters:['che6','che7','che8','che9','che10']}
+];
+
+/* Complete Revision */
+const REVISION = [
+  {id:'rev-mat', n:'Mathematics — All in One', s:'Mathematics', u:'https://youtu.be/yjTf9Lar5tY'},
+  {id:'rev-phy', n:'Physics — All in One', s:'Physics', u:'https://www.youtube.com/live/GtN6qRR78A8?si=fJZcciLaLh8IFNH7'},
+  {id:'rev-pc', n:'Chemistry — Physical Chemistry', s:'Chemistry', u:'https://www.youtube.com/live/ip6sNvps2Ew?si=8xIbQRc8c0QY1RL5'},
+  {id:'rev-ic', n:'Chemistry — Inorganic Chemistry', s:'Chemistry', u:'https://www.youtube.com/live/Rai8dGtRgZc?si=0M_FDjKWiPRN0Nh5'},
+  {id:'rev-oc', n:'Chemistry — Organic Chemistry', s:'Chemistry', u:'https://www.youtube.com/live/xDdZcBH2Vh0?si=qoIQIscjN5VHyW3S'},
+  {id:'rev-che', n:'Complete Chemistry', s:'Chemistry', u:'https://youtu.be/LxThroueZrc'},
+  {id:'rev-pe', n:'Physical Education — All in One', s:'Physical Education', u:'https://youtu.be/7r3I6l_azOQ'}
+];
+
+/* Advance Push */
+const ADV_PUSH = [
+  {id:'ap-mat', n:'Mathematics', s:'Mathematics', u:'https://www.youtube.com/live/xNDHw34tLV4?si=DAi65r2hj7Wop7Fx'},
+  {id:'ap-ph1', n:'Physics — Part 1', s:'Physics', u:'https://www.youtube.com/live/_lLwOvc0j70?si=gzGe4LMVpSFSnEWq'},
+  {id:'ap-ph2', n:'Physics — Part 2', s:'Physics', u:'https://www.youtube.com/live/0r2wKXLWbsQ?si=Ix6OpssFlf0_r79y'},
+  {id:'ap-pc', n:'Physical Chemistry', s:'Chemistry', u:'https://www.youtube.com/live/lN27tr0vCyY?si=voahdoRC-dN_j8UE'},
+  {id:'ap-ic', n:'Inorganic Chemistry', s:'Chemistry', u:'https://www.youtube.com/live/AMSVJZ9_b6w?si=wmVd9Q_OziQnF7PV'},
+  {id:'ap-oc', n:'Organic Chemistry', s:'Chemistry', u:'https://www.youtube.com/live/eLGdJNnQrVM?si=TYifvDbkI64husxA'}
+];
+
+/* Sample Paper Analysis (videos only — the PDF library has been removed) */
+const ANALYSIS = [
+  {id:'an-mat', n:'Mathematics', s:'Mathematics', u:'https://youtu.be/Xd-mwAhYFg4'},
+  {id:'an-phy', n:'Physics', s:'Physics', u:'https://youtu.be/gQJx4c98DNY'},
+  {id:'an-che', n:'Chemistry', s:'Chemistry', u:'https://youtu.be/WvIs_nEKBvY'},
+  {id:'an-eng', n:'English', s:'English Core', u:'https://youtu.be/tY7KY_a3RgQ'},
+  {id:'an-pe', n:'Physical Education', s:'Physical Education', u:'https://youtu.be/7u8y1y58uew'}
+];
+
+/* English Portal */
+const ENGLISH = {
+  oneshot:[
+    {g:'Flamingo — Prose', items:[
+      {id:'e1',n:'The Last Lesson',u:'https://youtu.be/G9EEwMHSo7Y'},
+      {id:'e2',n:'Lost Spring',u:'https://youtu.be/wcmk4H05le4'},
+      {id:'e3',n:'Deep Water',u:'https://youtu.be/Yw2YlZDNpb0'},
+      {id:'e4',n:'The Rattrap',u:'https://youtu.be/XwoE0vR8qes'},
+      {id:'e5',n:'Indigo',u:'https://youtu.be/jiQn2mAdZKY'},
+      {id:'e6',n:'Poets and Pancakes',u:'https://youtu.be/-_QUxyfoAhU'},
+      {id:'e7',n:'The Interview',u:'https://youtu.be/WhOigJNWSRM'},
+      {id:'e8',n:'Going Places',u:'https://youtu.be/wK7bu5YTRgM'}]},
+    {g:'Flamingo — Poetry', items:[
+      {id:'e9',n:'My Mother at Sixty-Six',u:'https://youtu.be/yTz0qfIqqTs'},
+      {id:'e10',n:'Keeping Quiet',u:'https://youtu.be/SHGayrunu4M'},
+      {id:'e11',n:'A Thing of Beauty',u:'https://youtu.be/-m29uGoRzfo'},
+      {id:'e12',n:'A Roadside Stand',u:'https://youtu.be/JY8tT8_MZJs'},
+      {id:'e13',n:"Aunt Jennifer's Tigers",u:'https://youtu.be/y-zIFDtcR3k'}]},
+    {g:'Vistas', items:[
+      {id:'e14',n:'The Third Level',u:'https://youtu.be/wYYUavf066g'},
+      {id:'e15',n:'The Tiger King',u:'https://youtu.be/9oN7zB340m4'},
+      {id:'e16',n:'Journey to the End of the Earth',u:'https://youtu.be/t6Kv1onPqH0'},
+      {id:'e17',n:'The Enemy',u:'https://youtu.be/kuzPX-r5qxw'},
+      {id:'e18',n:'On the Face of It',u:'https://youtu.be/v_wgZ16JJ5M'},
+      {id:'e19',n:'Memories of Childhood',u:'https://youtu.be/j2-2mC1sHh0'}]}
+  ],
+  animated:[
+    {g:'Animated English Lectures', items:[
+      {id:'a1',n:'The Last Lesson',u:'https://youtu.be/ueUjhbyXMqU'},
+      {id:'a2',n:'My Mother at Sixty-Six',u:'https://youtu.be/1qjezUbuQj8'},
+      {id:'a3',n:'The Tiger King',u:'https://youtu.be/zOoitDwLvTg'},
+      {id:'a4',n:'Keeping Quiet',u:'https://youtu.be/N9Q6pF3xMrE'},
+      {id:'a5',n:'The Third Level',u:'https://youtu.be/fsfdXY9d3lI'},
+      {id:'a6',n:'The Interview',u:'https://youtu.be/ZP2Lgj1f6MA'},
+      {id:'a7',n:'Lost Spring — Part 1',u:'https://youtu.be/1nUU6wIEqcE'},
+      {id:'a8',n:'Lost Spring — Part 2',u:'https://youtu.be/VwOrlH6cipE'},
+      {id:'a9',n:'Indigo',u:'https://youtu.be/Ttg_gmJoHeE'},
+      {id:'a10',n:'Deep Water',u:'https://youtu.be/O0mtKGRT3zE'},
+      {id:'a11',n:'A Roadside Stand',u:'https://youtu.be/S_slEUUyylQ'},
+      {id:'a12',n:'The Rattrap',u:'https://youtu.be/CImL9tobpSE'},
+      {id:'a13',n:'The Enemy',u:'https://youtu.be/LYN3HDjKTSw'},
+      {id:'a14',n:'A Thing of Beauty',u:'https://youtu.be/3vFGmhcKjvw'},
+      {id:'a15',n:'Journey to the End of the Earth',u:'https://youtu.be/UmRBeNxrGw8'},
+      {id:'a16',n:'Poets and Pancakes',u:'https://youtu.be/79PjRolV8EU'},
+      {id:'a17',n:'On the Face of It',u:'https://youtu.be/k3AV33eeTyQ'},
+      {id:'a18',n:'Going Places',u:'https://youtu.be/WvruK0JEIsM'},
+      {id:'a19',n:"Aunt Jennifer's Tigers",u:'https://youtu.be/XiMpTdrra6E'},
+      {id:'a20',n:'Memories of Childhood — Part 1',u:'https://youtu.be/Y2XIGtAUCSY'},
+      {id:'a21',n:'Memories of Childhood — Part 2',u:'https://youtu.be/YVsT9z3gx9c'}]}
+  ],
+  grammar:[
+    {g:'Grammar and Writing', items:[
+      {id:'g1',n:'Notice Writing',u:'https://youtu.be/ARGcGtngxvw'},
+      {id:'g2',n:'Invitation and Reply',u:'https://youtu.be/0juZ78dUv8c'},
+      {id:'g3',n:'Letter Writing',u:'https://youtu.be/3aCwbm5qeCI'},
+      {id:'g4',n:'Article Writing',u:'https://youtu.be/kSe_fTa-OZM'},
+      {id:'g5',n:'Report Writing',u:'https://youtu.be/rEpJHpjEXK0'},
+      {id:'g6',n:'Unseen Passage',u:'https://youtu.be/V3fnajAjXNk'}]}
+  ],
+  complete:[
+    {g:'Complete Vistas', items:[
+      {id:'c1',n:'Complete Vistas — Standard',u:'https://youtu.be/lSK26xepy24'},
+      {id:'c2',n:'Complete Vistas — Animated',u:'https://www.youtube.com/live/1uSbzMjROWg?si=vs3X9_o0fpTl5vfz'}]},
+    {g:'Complete Flamingo', items:[
+      {id:'c3',n:'Complete Flamingo — Standard',u:'https://www.youtube.com/live/13TLxog6zFY?si=IFHWwnGmj5DUiD6k'},
+      {id:'c4',n:'Complete Flamingo — Animated',u:'https://www.youtube.com/live/HWBRGhOZGI8?si=qLKz0Xwas0RisW_r'}]},
+    {g:'All Poems in One Video', items:[
+      {id:'c5',n:'All Poems — Standard',u:'https://youtu.be/IDYDaFlZILU'},
+      {id:'c6',n:'All Poems — Animated',u:'https://youtu.be/DxFO-0LO1eY'}]},
+    {g:'Grammar All in One', items:[
+      {id:'c7',n:'Grammar All in One',u:'https://youtu.be/xEvIAificGc'}]}
+  ],
+  authors:[
+    {n:'The Last Lesson',a:'Alphonse Daudet',b:'Flamingo',c:'Flamingo Prose'},
+    {n:'Lost Spring',a:'Anees Jung',b:'Flamingo',c:'Flamingo Prose'},
+    {n:'Deep Water',a:'William Douglas',b:'Flamingo',c:'Flamingo Prose'},
+    {n:'The Rattrap',a:'Selma Lagerlöf',b:'Flamingo',c:'Flamingo Prose'},
+    {n:'Indigo',a:'Louis Fischer',b:'Flamingo',c:'Flamingo Prose'},
+    {n:'Poets and Pancakes',a:'Asokamitran',b:'Flamingo',c:'Flamingo Prose'},
+    {n:'The Interview',a:'Christopher Silvester',b:'Flamingo',c:'Flamingo Prose'},
+    {n:'Going Places',a:'A. R. Barton',b:'Flamingo',c:'Flamingo Prose'},
+    {n:'My Mother at Sixty-Six',a:'Kamala Das',b:'Flamingo',c:'Flamingo Poetry'},
+    {n:'Keeping Quiet',a:'Pablo Neruda',b:'Flamingo',c:'Flamingo Poetry'},
+    {n:'A Thing of Beauty',a:'John Keats',b:'Flamingo',c:'Flamingo Poetry'},
+    {n:'A Roadside Stand',a:'Robert Frost',b:'Flamingo',c:'Flamingo Poetry'},
+    {n:"Aunt Jennifer's Tigers",a:'Adrienne Rich',b:'Flamingo',c:'Flamingo Poetry'},
+    {n:'The Third Level',a:'Jack Finney',b:'Vistas',c:'Vistas'},
+    {n:'The Tiger King',a:'Kalki',b:'Vistas',c:'Vistas'},
+    {n:'Journey to the End of the Earth',a:'Tishani Doshi',b:'Vistas',c:'Vistas'},
+    {n:'The Enemy',a:'Pearl S. Buck',b:'Vistas',c:'Vistas'},
+    {n:'On the Face of It',a:'Susan Hill',b:'Vistas',c:'Vistas'},
+    {n:'Memories of Childhood',a:'Zitkala-Sa and Bama',b:'Vistas',c:'Vistas'}
+  ]
+};
+
+/* English category structure (groups used for the two-level portals) */
+const ENG_CATS = {
+  oneshot:{n:'One-Shot Lectures', d:'Chapter-wise one-shot lectures for Flamingo prose, Flamingo poetry and Vistas.',
+    groups:[
+      {id:'prose',  n:'Flamingo — Prose',  items:ENGLISH.oneshot[0].items},
+      {id:'poetry', n:'Flamingo — Poetry', items:ENGLISH.oneshot[1].items},
+      {id:'vistas', n:'Vistas',            items:ENGLISH.oneshot[2].items}
+    ]},
+  animated:{n:'Animated English Lectures', d:'Fully animated explainers — kept completely separate from the standard one-shots.',
+    groups:[{id:'all', n:'Animated English Lectures', items:ENGLISH.animated[0].items}]},
+  grammar:{n:'Grammar & Writing', d:'Notice, invitation, letter, article, report writing and unseen passage practice.',
+    groups:[{id:'all', n:'Grammar and Writing', items:ENGLISH.grammar[0].items}]},
+  complete:{n:'Complete Book Lectures', d:'Full-book lectures: complete Vistas, complete Flamingo, all poems and grammar in one video.',
+    groups:[
+      {id:'vistas',   n:'Complete Vistas',            items:ENGLISH.complete[0].items},
+      {id:'flamingo', n:'Complete Flamingo',          items:ENGLISH.complete[1].items},
+      {id:'poems',    n:'All Poems in One Video',     items:ENGLISH.complete[2].items},
+      {id:'grammar',  n:'Grammar All in One',         items:ENGLISH.complete[3].items}
+    ]}
+};
+const ENG_ORDER = ['oneshot','animated','grammar','authors','complete','pyq','als'];
+
+/* Practicals */
+const PRACTICALS = [
+  {id:'pr-phy', n:'Physics Practicals', total:30, rows:[['Two experiments (one from each applicable section)',16],['Practical record / file',6],['Investigatory project',3],['Viva voce',5]],
+   items:['Aim','Apparatus','Formula','Circuit or ray diagram','Observation table','Calculation','Result','Two precautions']},
+  {id:'pr-che', n:'Chemistry Practicals', total:30, rows:[['Volumetric analysis / titration',8],['Salt analysis',8],['Content-based experiment',6],['Project work',4],['Viva and class record',4]],
+   items:['Titration','Salt analysis','Functional-group tests','Project work','Viva']},
+  {id:'pr-pe', n:'Physical Education Practicals', total:30, rows:[['Physical fitness tests',6],['Sports proficiency',7],['Yogic practices',7],['Practical file',5],['Viva voce',5]],
+   items:['Fitness tests','Games proficiency','Yoga practices','Practical file','Viva voce']},
+  {id:'pr-mat', n:'Mathematics Internal Assessment', total:20, rows:[['School tests / periodic assessment',10],['Mathematics activities and lab work',10]],
+   items:['Activity file (3)','Writing the activity (5)','Viva (2)']},
+  {id:'pr-eng', n:'English ALS Assessment', total:20, rows:[['Listening',8],['Speaking / project presentation',7],['Viva',5]],
+   items:['Listening practice','Speaking practice','Project presentation','Viva']}
+];
+
+/* Weightage */
+const WEIGHTAGE = {
+  physics:{name:'Physics', total:70, rows:[
+    ['Units I & II — Electrostatics + Current Electricity',16],
+    ['Units III & IV — Magnetism, EMI, AC',17],
+    ['Units V & VI — EM Waves, Ray Optics, Wave Optics',18],
+    ['Units VII & VIII — Dual Nature, Atoms, Nuclei',12],
+    ['Unit IX — Semiconductor Electronics',7]]},
+  chemistry:{name:'Chemistry', total:70, rows:[
+    ['Solutions',7],['Electrochemistry',9],['Chemical Kinetics',7],
+    ['d- and f-Block Elements',7],['Coordination Compounds',7],
+    ['Haloalkanes and Haloarenes',6],['Alcohols, Phenols and Ethers',6],
+    ['Aldehydes, Ketones and Carboxylic Acids',8],['Amines',6],['Biomolecules',7]]},
+  maths:{name:'Mathematics', total:80, rows:[
+    ['Relations and Functions (incl. Inverse Trigonometry)',8],
+    ['Algebra — Matrices, Determinants',10],
+    ['Calculus — Continuity, AOD, Integrals, AOI, Diff. Eq.',35],
+    ['Vectors and 3D Geometry',14],
+    ['Linear Programming',5],
+    ['Probability',8]]},
+  english:{name:'English Core', total:80, rows:[
+    ['Section A — Reading Skills',22],
+    ['Section B — Creative Writing Skills',18],
+    ['Section C — Literature',40]]},
+  pe:{name:'Physical Education', total:70, rows:[
+    ['Management of Sporting Events',7],['Children and Women in Sports',7],
+    ['Yoga as a Preventive Measure for Lifestyle Disease',7],
+    ['Physical Education and Sports for CWSN',7],['Sports and Nutrition',7],
+    ['Test and Measurement in Sports',7],['Physiology and Injuries in Sports',7],
+    ['Biomechanics and Sports',7],['Psychology and Sports',7],['Training in Sports',7]]}
+};
+
+const PYQ_YEARS = [2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const DEFAULT_CD = {id:'cd-default', name:'Boards', date:'2027-02-01T00:00'};
+
+/* ------------------ 2. STORAGE ------------------ */
+const DB = {
+  get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ toast('Storage unavailable or full'); return false; } },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+
+let progress = DB.get('mb_progress',{});
+let pyq = DB.get('mb_pyq',{});
+let events = DB.get('mb_events',[]);
+let folders = DB.get('mb_folders',[]);
+let profile = DB.get('mb_profile',{name:'',username:'',photo:''});
+let countdowns = DB.get('mb_countdowns',[Object.assign({},DEFAULT_CD)]);
+let settings = DB.get('mb_settings',{motion:false,compact:false,goal:4});
+let focusSessions = DB.get('mb_focus',[]);
+
+function saveProgress(){ DB.set('mb_progress',progress); }
+function savePyq(){ DB.set('mb_pyq',pyq); }
+function saveEvents(){ DB.set('mb_events',events); }
+function saveFolders(){ DB.set('mb_folders',folders); }
+function saveProfile(){ DB.set('mb_profile',profile); }
+function saveCountdowns(){ DB.set('mb_countdowns',countdowns); }
+function saveSettings(){ DB.set('mb_settings',settings); }
+function saveFocus(){ DB.set('mb_focus',focusSessions); }
+
+/* ------------------ 3. UTILITIES ------------------ */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function uid(p){ return (p||'id')+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function fmt(ts){
+  if(!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleDateString()+' '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+function dur(a,b){
+  if(!a||!b) return '—';
+  let s = Math.round((b-a)/1000);
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
+  if(h>0) return h+'h '+m+'m';
+  return m+'m';
+}
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('on'),2200);
+}
+function openOverlay(id){ document.getElementById(id).classList.add('on'); }
+function closeOverlay(id){ document.getElementById(id).classList.remove('on'); }
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('on'); });
+});
+function crumbs(items){
+  return `<div class="crumbs">${items.map((it,i)=>{
+    const last = i===items.length-1;
+    if(it.h && !last) return `<a href="${it.h}">${esc(it.t)}</a><span class="sep">›</span>`;
+    return `<span class="cur">${esc(it.t)}</span>`;
+  }).join('')}</div>`;
+}
+
+/* ------------------ 4. PROGRESS ------------------ */
+function rec(id){
+  if(!progress[id]) progress[id] = {status:'none', chapterDone:false, sessions:[], note:'', bookmarked:false, revised:false};
+  const r = progress[id];
+  if(!r.sessions) r.sessions=[];
+  return r;
+}
+function statusOf(id){ return rec(id).status || 'none'; }
+function labelOf(s){ return {none:'Not Started', progress:'In Progress', finished:'Finished', revised:'Revised'}[s]||'Not Started'; }
+
+/* Start a lecture. If an unfinished session already exists for this id,
+   resume it instead of creating a duplicate (this makes Continue Learning meaningful). */
+function startLecture(id, title, url){
+  const r = rec(id);
+  const open = [...r.sessions].reverse().find(s=>!s.finish);
+  if(!open){
+    r.sessions.push({start:Date.now(), finish:null});
+  }
+  if(r.status==='none') r.status='progress';
+  saveProgress();
+  if(url){ try{ window.open(url,'_blank','noopener'); }catch(e){} }
+  refreshCards();
+  toast('Started: '+title);
+}
+function finishLecture(id, title){
+  const r = rec(id);
+  const open = [...r.sessions].reverse().find(s=>!s.finish);
+  if(open){ open.finish = Date.now(); }
+  else { r.sessions.push({start:Date.now(), finish:Date.now()}); }
+  r.status = 'finished';
+  r.chapterDone = true;
+  saveProgress();
+  refreshCards();
+  toast('Finished: '+title);
+}
+function toggleChapter(id, val){
+  const r = rec(id);
+  r.chapterDone = !!val;
+  if(val && (r.status==='none'||r.status==='progress')) r.status='finished';
+  if(!val && r.status==='finished') r.status='progress';
+  saveProgress();
+  refreshCards();
+}
+function markRevised(id){
+  const r = rec(id);
+  r.revised = !r.revised;
+  r.status = r.revised ? 'revised' : (r.chapterDone?'finished':(r.sessions.length?'progress':'none'));
+  saveProgress(); refreshCards(); toast(r.revised?'Marked revised':'Revision cleared');
+}
+function toggleBookmark(id){
+  const r = rec(id);
+  r.bookmarked = !r.bookmarked;
+  saveProgress(); refreshCards();
+  toast(r.bookmarked?'Bookmarked':'Bookmark removed');
+}
+function openNote(id, title){
+  const r = rec(id);
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `<h3>Notes — ${esc(title)}</h3>
+    <textarea class="field" id="noteArea" placeholder="Write your notes here…">${esc(r.note||'')}</textarea>
+    <div class="mrow">
+      <button class="btn sm" onclick="closeOverlay('modalOverlay')">Cancel</button>
+      <button class="btn gold sm" id="noteSave">Save Note</button>
+    </div>`;
+  openOverlay('modalOverlay');
+  document.getElementById('noteSave').onclick = ()=>{
+    r.note = document.getElementById('noteArea').value;
+    saveProgress(); closeOverlay('modalOverlay'); toast('Note saved');
+  };
+}
+
+/* ID-only wrappers — avoid embedding titles/URLs in inline handlers */
+function startById(id){
+  const it = findItem(id);
+  if(!it || !it.u){ toast('No lecture link available for this item'); return; }
+  startLecture(id, it.n, it.u);
+}
+function finishById(id){
+  const it = findItem(id);
+  finishLecture(id, it?it.n:id);
+}
+function noteById(id){
+  const it = findItem(id);
+  openNote(id, it?it.n:id);
+}
+
+/* Central catalogue lookup — covers every lecture in the app. */
+function findItem(id){
+  for(const k in SUBJECTS){
+    const s = SUBJECTS[k];
+    const c = s.chapters.find(x=>x.id===id);
+    if(c) return {n:c.n, u:c.u, s:s.name, subj:k};
+    if(s.featured && s.featured.id===id) return {n:s.featured.n, u:s.featured.u, s:s.name, subj:k};
+  }
+  const adv = ADV_CHEM.find(x=>x.id===id);
+  if(adv) return {n:adv.n, u:adv.u, s:'Advanced Chemistry', subj:'chemistry'};
+  const rev = REVISION.find(x=>x.id===id);
+  if(rev) return {n:rev.n, u:rev.u, s:rev.s||'Complete Revision', subj:null};
+  const ap = ADV_PUSH.find(x=>x.id===id);
+  if(ap) return {n:ap.n, u:ap.u, s:ap.s||'Advance Push', subj:null};
+  const an = ANALYSIS.find(x=>x.id===id);
+  if(an) return {n:an.n, u:an.u, s:an.s||'Sample Paper Analysis', subj:null};
+  for(const k in ENGLISH){
+    if(Array.isArray(ENGLISH[k])){
+      for(const g of ENGLISH[k]){
+        if(g.items){
+          const it = g.items.find(x=>x.id===id);
+          if(it) return {n:it.n, u:it.u, s:'English Core', subj:'english'};
+        }
+      }
+    }
+  }
+  if(id==='prac-feat') return {n:'Practicals 30/30', u:'https://youtu.be/DzpIY6F6SS4', s:'Practicals', subj:null};
+  return null;
+}
+function findTitle(id){ const it = findItem(id); return it?it.n:id; }
+
+/* Subject completion */
+function subjectStats(key){
+  const s = SUBJECTS[key];
+  const total = s.chapters.length;
+  let done = 0;
+  s.chapters.forEach(c=>{ if(rec(c.id).chapterDone) done++; });
+  return {total, done, pct: total? Math.round(done/total*100):0};
+}
+function overallStats(){
+  let total=0, done=0, lectures=0, sessions=0, minutes=0;
+  Object.keys(SUBJECTS).forEach(k=>{
+    const st = subjectStats(k); total+=st.total; done+=st.done;
+  });
+  Object.values(progress).forEach(r=>{
+    if(r.sessions && r.sessions.length){
+      lectures += r.sessions.filter(s=>s.finish).length;
+      r.sessions.forEach(s=>{ if(s.finish) minutes += (s.finish-s.start)/60000; });
+      sessions += r.sessions.length;
+    }
+  });
+  return {total, done, pct: total? Math.round(done/total*100):0, lectures, sessions, minutes:Math.round(minutes)};
+}
+function pyqStats(){
+  let total=0, done=0;
+  Object.keys(SUBJECTS).forEach(k=>{
+    SUBJECTS[k].chapters.forEach(c=>{
+      total += PYQ_YEARS.length;
+      const arr = pyq[c.id]||[];
+      done += arr.filter(Boolean).length;
+    });
+  });
+  return {total, done, pct: total? Math.round(done/total*100):0};
+}
+function subjectPyqStats(key){
+  let total=0, done=0;
+  SUBJECTS[key].chapters.forEach(c=>{
+    total += PYQ_YEARS.length;
+    done += (pyq[c.id]||[]).filter(Boolean).length;
+  });
+  return {total, done, pct: total? Math.round(done/total*100):0};
+}
+function focusMinutes(){
+  return Math.round(focusSessions.reduce((a,s)=>a+(s.seconds||0),0)/60);
+}
+
+/* Continue Learning helpers */
+function unfinishedSessions(){
+  const list = [];
+  Object.keys(progress).forEach(id=>{
+    (progress[id].sessions||[]).forEach(s=>{
+      if(!s.finish) list.push({id, start:s.start});
+    });
+  });
+  return list.sort((a,b)=>b.start-a.start);
+}
+function allStartedSessions(){
+  const list = [];
+  Object.keys(progress).forEach(id=>{
+    (progress[id].sessions||[]).forEach(s=>{ list.push({id, start:s.start, finish:s.finish}); });
+  });
+  return list.sort((a,b)=>b.start-a.start);
+}
+
+/* ------------------ 5. ARTWORK ------------------ */
+function posterArt(subKey){
+  const shapes = {
+    physics:'<circle cx="50" cy="50" r="10" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/><ellipse cx="50" cy="50" rx="34" ry="13" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2"/><ellipse cx="50" cy="50" rx="34" ry="13" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2" transform="rotate(60 50 50)"/><ellipse cx="50" cy="50" rx="34" ry="13" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2" transform="rotate(120 50 50)"/>',
+    chemistry:'<path d="M40 18h20v18l14 30a10 10 0 0 1-9 15H35a10 10 0 0 1-9-15l14-30z" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/><circle cx="50" cy="66" r="7" fill="rgba(255,255,255,.28)"/>',
+    maths:'<rect x="20" y="24" width="60" height="52" rx="5" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/><path d="M40 24v52M60 24v52M20 42h60M20 58h60" stroke="rgba(255,255,255,.3)" stroke-width="1.6"/>',
+    english:'<path d="M22 26h22a10 10 0 0 1 6 10v42a10 10 0 0 0-6-8H22z" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/><path d="M78 26H56a10 10 0 0 0-6 10v42a10 10 0 0 1 6-8h22z" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/>',
+    pe:'<circle cx="50" cy="26" r="8" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/><path d="M50 34v26M50 44l-16 10M50 44l16 10M50 60l-12 20M50 60l12 20" stroke="rgba(255,255,255,.5)" stroke-width="2.4" fill="none" stroke-linecap="round"/>'
+  };
+  return shapes[subKey] || shapes.physics;
+}
+function poster(subKey, idx, label){
+  const s = SUBJECTS[subKey] || {accent:'#D4AF37'};
+  const a = s.accent;
+  return `<div class="poster" style="background:linear-gradient(135deg,${a}33 0%,#101216 62%),radial-gradient(circle at 82% 20%,${a}44,transparent 58%)">
+    <svg class="deco" viewBox="0 0 100 100">${posterArt(subKey)}</svg>
+    <span class="num">${String(idx+1).padStart(2,'0')}</span>
+    <span class="badge">${esc(label)}</span>
+  </div>`;
+}
+
+/* ------------------ 6. CARD RENDERERS ------------------ */
+function chapterCardHTML(subKey, ch, idx){
+  const r = rec(ch.id);
+  const st = r.status || 'none';
+  const last = r.sessions.filter(s=>s.finish).slice(-1)[0];
+  return `<div class="card chapter tilt" data-id="${ch.id}">
+    ${poster(subKey, idx, (SUBJECTS[subKey]?SUBJECTS[subKey].name:'Lecture'))}
+    <div class="ch-body">
+      <h4>${esc(ch.n)}</h4>
+      <span class="status ${st}">${labelOf(st)}</span>
+      <label class="chk"><input type="checkbox" ${r.chapterDone?'checked':''} onchange="toggleChapter('${ch.id}', this.checked)"> Chapter completed</label>
+      <div class="ch-actions">
+        <button class="btn gold sm" onclick="startById('${ch.id}')">Start Now</button>
+        <button class="btn sm" onclick="finishById('${ch.id}')">Mark Finished</button>
+        <button class="btn sm" onclick="markRevised('${ch.id}')">${r.revised?'Un-revise':'Revised'}</button>
+        <button class="btn sm" onclick="toggleBookmark('${ch.id}')">${r.bookmarked?'★':'☆'}</button>
+        <button class="btn sm" onclick="noteById('${ch.id}')">Notes</button>
+      </div>
+      <div class="ts">Started: ${fmt(r.sessions.length?r.sessions[0].start:null)}<br>
+      Finished: ${last?fmt(last.finish):'—'} · Duration: ${last?dur(last.start,last.finish):'—'}<br>
+      Sessions: ${r.sessions.length}</div>
+    </div>
+  </div>`;
+}
+
+function simpleCardHTML(subKey, item, idx){
+  const r = rec(item.id);
+  const st = r.status || 'none';
+  const last = r.sessions.filter(s=>s.finish).slice(-1)[0];
+  return `<div class="card chapter tilt">
+    ${poster(subKey, idx, (item.s||'Lecture'))}
+    <div class="ch-body">
+      <h4>${esc(item.n)}</h4>
+      <span class="status ${st}">${labelOf(st)}</span>
+      <label class="chk"><input type="checkbox" ${r.chapterDone?'checked':''} onchange="toggleChapter('${item.id}', this.checked)"> Completed</label>
+      <div class="ch-actions">
+        <button class="btn gold sm" onclick="startById('${item.id}')">Start Now</button>
+        <button class="btn sm" onclick="finishById('${item.id}')">Mark Finished</button>
+        <button class="btn sm" onclick="noteById('${item.id}')">Notes</button>
+      </div>
+      <div class="ts">Started: ${fmt(r.sessions.length?r.sessions[0].start:null)} · Finished: ${last?fmt(last.finish):'—'}</div>
+    </div>
+  </div>`;
+}
+
+/* ------------------ 7. ROUTER ------------------ */
+const VIEWS = ['home','dashboard','subjects','subject','advanced','english','revision','advance',
+               'analysis','practicals','weightage','pyq','calendar','folders','settings','focus'];
+const NAVMAP = {
+  home:'home', dashboard:'dashboard', subjects:'subjects', subject:'subjects',
+  advanced:'subjects', english:'subjects', revision:'subjects', advance:'subjects',
+  analysis:'subjects', practicals:'practicals', weightage:'weightage', pyq:'pyq',
+  calendar:'calendar', folders:null, settings:null, focus:null
+};
+
+function go(hash){ location.hash = hash; }
+
+function route(){
+  const h = (location.hash||'#/home').replace(/^#\/?/,'');
+  const parts = h.split('/').filter(Boolean);
+  const name = parts[0]||'home';
+  const a = parts[1]||'';
+  const b = parts[2]||'';
+
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el = document.getElementById('v-'+(VIEWS.includes(name)?name:'home'));
+  if(el) el.classList.add('active');
+
+  document.querySelectorAll('nav.main a').forEach(x=>x.classList.remove('active'));
+  const navTarget = NAVMAP[name];
+  if(navTarget){
+    const link = document.querySelector('nav.main a[href="#/'+navTarget+'"]');
+    if(link) link.classList.add('active');
+  }
+  document.getElementById('mainNav').classList.remove('open');
+  window.scrollTo(0,0);
+
+  switch(name){
+    case 'dashboard':  renderDashboard(); break;
+    case 'subjects':   renderSubjects(); break;
+    case 'subject':    renderSubjectPortal(a); break;
+    case 'advanced':   renderAdvanced(a); break;
+    case 'english':    renderEnglish(a, b); break;
+    case 'revision':   renderGridPortal('revisionGrid','Complete Revision',
+                        'All-in-One revision lectures. These are separate from the chapter-level one-shots.', REVISION, 'chemistry'); break;
+    case 'advance':    renderGridPortal('advanceGrid','Advance Push for Boards',
+                        'Final-phase intensive sessions. Kept separate from regular one-shots and All-in-One revision.', ADV_PUSH, 'chemistry'); break;
+    case 'analysis':   renderGridPortal('analysisGrid','Sample Paper Analysis',
+                        'Video analysis of sample papers. These are analysis videos, not downloadable documents.', ANALYSIS, 'physics'); break;
+    case 'practicals': renderPracticals(a); break;
+    case 'weightage':  renderWeightage(a); break;
+    case 'pyq':        renderPyq(a); break;
+    case 'calendar':   renderCalendar(); break;
+    case 'folders':    renderFolders(); break;
+    case 'settings':   renderSettings(); break;
+    case 'focus':      renderFocus(); break;
+  }
+  initTilt(document);
+}
+window.addEventListener('hashchange', route);
+
+/* ------------------ 8. RENDER: SUBJECT LIST ------------------ */
+function subjectIconSVG(key){
+  const c = (SUBJECTS[key]||{accent:'#D4AF37'}).accent;
+  const paths = {
+    physics:`<circle cx="32" cy="32" r="7" fill="none" stroke="${c}" stroke-width="2.4"/><ellipse cx="32" cy="32" rx="26" ry="10" fill="none" stroke="${c}" stroke-width="2" opacity=".75"/><ellipse cx="32" cy="32" rx="26" ry="10" fill="none" stroke="${c}" stroke-width="2" opacity=".75" transform="rotate(60 32 32)"/><ellipse cx="32" cy="32" rx="26" ry="10" fill="none" stroke="${c}" stroke-width="2" opacity=".75" transform="rotate(120 32 32)"/>`,
+    chemistry:`<path d="M24 8h16v14l11 24a8 8 0 0 1-7 12H20a8 8 0 0 1-7-12l11-24z" fill="none" stroke="${c}" stroke-width="2.4"/><circle cx="32" cy="44" r="6" fill="${c}" opacity=".35"/>`,
+    maths:`<rect x="8" y="14" width="48" height="36" rx="4" fill="none" stroke="${c}" stroke-width="2.4"/><path d="M24 14v36M40 14v36M8 26h48M8 38h48" stroke="${c}" stroke-width="1.8" opacity=".65"/>`,
+    english:`<path d="M12 14h14a8 8 0 0 1 6 8v28a8 8 0 0 0-6-6H12z" fill="none" stroke="${c}" stroke-width="2.4"/><path d="M52 14H38a8 8 0 0 0-6 8v28a8 8 0 0 1 6-6h14z" fill="none" stroke="${c}" stroke-width="2.4"/>`,
+    pe:`<circle cx="32" cy="14" r="6" fill="none" stroke="${c}" stroke-width="2.4"/><path d="M32 21v18M32 27l-12 8M32 27l12 8M32 39l-9 15M32 39l9 15" stroke="${c}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`
+  };
+  return `<svg viewBox="0 0 64 64">${paths[key]||paths.physics}</svg>`;
+}
+
+function renderSubjects(){
+  const box = document.getElementById('subjectList');
+  box.innerHTML = Object.keys(SUBJECTS).map(k=>{
+    const s = SUBJECTS[k], st = subjectStats(k);
+    return `<div class="card subj-card tilt" onclick="go('#/subject/${k}')">
+      <div class="art" style="background:linear-gradient(135deg,${s.accent}22,#0f1216)">${subjectIconSVG(k)}</div>
+      <h3>${s.name}</h3>
+      <p class="ts">${esc(s.desc)}</p>
+      <div class="bar"><i style="width:${st.pct}%"></i></div>
+      <div class="meta"><span>${st.done} / ${st.total} chapters</span><span class="pct">${st.pct}%</span></div>
+    </div>`;
+  }).join('');
+
+  const specials = [
+    {n:'Advanced Chemistry', d:'Physical, Inorganic and Organic advanced revision.', h:'#/advanced', c:'#2ED39B'},
+    {n:'English Portal', d:'One-shots, animated lectures, grammar, authors and ALS.', h:'#/english', c:'#E7C97A'},
+    {n:'Complete Revision', d:'All-in-One revision lectures for every subject.', h:'#/revision', c:'#D4AF37'},
+    {n:'Advance Push for Boards', d:'Final-phase intensive sessions.', h:'#/advance', c:'#A97BFF'},
+    {n:'Sample Paper Analysis', d:'Video analysis of the latest sample papers.', h:'#/analysis', c:'#4D9FFF'},
+    {n:'PYQ Tracker', d:'Ten year slots per chapter, with subject-wise progress.', h:'#/pyq', c:'#E4572E'},
+    {n:'Practicals', d:'Physics, Chemistry, PE, Maths IA and English ALS.', h:'#/practicals', c:'#2ED39B'},
+    {n:'Weightage', d:'Marks distribution charts and tables, subject by subject.', h:'#/weightage', c:'#D4AF37'},
+    {n:'Focus Mode', d:'A local study timer that records your real elapsed time.', h:'#/focus', c:'#F5D76E'},
+    {n:'My Folders', d:'Organise chapters, bookmarks and notes locally.', h:'#/folders', c:'#A3A7B0'}
+  ];
+  document.getElementById('specialList').innerHTML = specials.map(s=>
+    `<div class="card tilt" style="cursor:pointer" onclick="go('${s.h}')">
+      <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,${s.c}33,transparent);
+        border:1px solid ${s.c}55;display:grid;place-items:center;margin-bottom:12px">
+        <span style="width:14px;height:14px;border-radius:50%;background:${s.c};box-shadow:0 0 16px ${s.c}"></span></div>
+      <h3 style="font-size:16px;margin-bottom:6px">${s.n}</h3>
+      <p class="ts">${s.d}</p>
+    </div>`).join('');
+  initTilt(box);
+}
+
+/* ------------------ 9. SUBJECT PORTAL ------------------ */
+function subjectContinue(key){
+  const ids = SUBJECTS[key].chapters.map(c=>c.id);
+  const un = unfinishedSessions().filter(x=>ids.includes(x.id));
+  if(un.length) return {id:un[0].id, start:un[0].start, open:true};
+  const ls = allStartedSessions().filter(x=>ids.includes(x.id));
+  return ls.length ? {id:ls[0].id, start:ls[0].start, open:false} : null;
+}
+
+function renderSubjectPortal(key){
+  const box = document.getElementById('subjectPortal');
+  const s = SUBJECTS[key];
+  if(!s){
+    box.innerHTML = crumbs([{t:'Home',h:'#/home'},{t:'Subjects',h:'#/subjects'},{t:'Not found'}]) +
+      '<h1 class="page">Subject not found</h1>';
+    return;
+  }
+  const st = subjectStats(key);
+  const isChem = key==='chemistry';
+  const cont = subjectContinue(key);
+  const contItem = cont ? findItem(cont.id) : null;
+
+  let contHTML = '';
+  if(cont && contItem){
+    contHTML = `<div class="card" style="margin-bottom:22px">
+      <div class="cl">
+        <div class="cl-info">
+          <span class="tag">${cont.open?'Continue Learning':'Last studied'}</span>
+          <h3 style="font-size:18px;margin:4px 0 6px">${esc(contItem.n)}</h3>
+          <div class="ts">${cont.open?'An unfinished session is open':'Most recent session'} · Last started ${fmt(cont.start)}</div>
+        </div>
+        <div class="btnrow">
+          <button class="btn gold sm" onclick="startById('${cont.id}')">${cont.open?'Resume':'Reopen'}</button>
+          <button class="btn sm" onclick="finishById('${cont.id}')">Mark Finished</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  box.innerHTML = `
+    ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'Subjects',h:'#/subjects'},{t:s.name}])}
+    <div class="phead" style="border-color:${s.accent}44;background:linear-gradient(135deg,${s.accent}22,#101216 65%)">
+      <div class="pic" style="border:1px solid ${s.accent}55">
+        <div style="width:56px;height:56px">${subjectIconSVG(key)}</div>
+      </div>
+      <div class="pinfo">
+        <h1 class="page" style="margin-bottom:4px;font-size:30px">${s.name}</h1>
+        <p class="sub" style="margin-bottom:10px">${esc(s.desc)}</p>
+        <div class="bar" style="max-width:420px"><i style="width:${st.pct}%"></i></div>
+        <div class="ts" style="margin-top:6px">${st.done} / ${st.total} chapters completed · ${st.pct}%</div>
+      </div>
+      <div class="btnrow">
+        <button class="btn sm" onclick="go('#/pyq/${key}')">PYQ Tracker</button>
+        <button class="btn sm" onclick="go('#/weightage/${key}')">Weightage</button>
+        <button class="btn sm" onclick="go('#/dashboard')">Dashboard</button>
+      </div>
+    </div>
+
+    ${contHTML}
+
+    ${isChem?`
+    <div class="mini-title" style="margin-bottom:12px">Advanced Chemistry</div>
+    <div class="card cat tilt" style="margin-bottom:26px;border-color:rgba(46,211,155,.35)"
+      onclick="go('#/advanced')">
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+        <div class="ic" style="border-color:rgba(46,211,155,.5);background:linear-gradient(135deg,rgba(46,211,155,.25),transparent)">
+          <span style="width:16px;height:16px;border-radius:50%;background:#2ED39B;box-shadow:0 0 18px #2ED39B"></span>
+        </div>
+        <div style="flex:1;min-width:200px">
+          <h3 style="font-size:19px;margin-bottom:6px">Advanced Chemistry Portal</h3>
+          <p class="ts">Physical, Inorganic and Organic chemistry — deeper advanced revision sessions, kept separate from the chapter one-shots.</p>
+        </div>
+        <button class="btn gold sm">Open Portal</button>
+      </div>
+    </div>`:''}
+
+    <div class="mini-title" style="margin-bottom:12px">${isChem?'Chapter-wise Lectures':'Chapters'}</div>
+    <div class="toolbar">
+      <input class="field" id="chSearch" placeholder="Search chapters…" style="flex:1;min-width:220px">
+      <select class="field" id="chFilter">
+        <option value="">All chapters</option>
+        <option value="none">Not started</option>
+        <option value="progress">In progress</option>
+        <option value="finished">Finished</option>
+        <option value="revised">Revised</option>
+        <option value="bookmarked">Bookmarked</option>
+      </select>
+    </div>
+
+    <div class="grid g3" id="chapterGrid">
+      ${s.chapters.map((c,i)=>chapterCardHTML(key,c,i)).join('')}
+    </div>
+    <div id="chEmpty" class="empty" style="display:none;margin-top:14px">No chapters match your filters.</div>
+
+    ${s.featured?`
+    <div class="mini-title" style="margin:32px 0 12px">All-in-One</div>
+    <div class="grid g3">${simpleCardHTML(key, s.featured, 0)}</div>`:''}
+  `;
+
+  const search = document.getElementById('chSearch');
+  const filter = document.getElementById('chFilter');
+  const empty = document.getElementById('chEmpty');
+  function applyFilter(){
+    const q = (search.value||'').toLowerCase();
+    const f = filter.value;
+    let visible = 0;
+    document.querySelectorAll('#chapterGrid .chapter').forEach(card=>{
+      const id = card.getAttribute('data-id');
+      const title = card.querySelector('h4').textContent.toLowerCase();
+      const r = rec(id);
+      let ok = title.includes(q);
+      if(ok && f){
+        if(f==='bookmarked') ok = !!r.bookmarked;
+        else if(f==='none') ok = (r.status||'none')==='none';
+        else ok = (r.status||'none')===f;
+      }
+      card.style.display = ok ? '' : 'none';
+      if(ok) visible++;
+    });
+    empty.style.display = visible ? 'none' : '';
+  }
+  if(search) search.addEventListener('input', applyFilter);
+  if(filter) filter.addEventListener('change', applyFilter);
+  initTilt(box);
+}
+
+/* ------------------ 10. ADVANCED CHEMISTRY ------------------ */
+function renderAdvanced(catId){
+  const box = document.getElementById('advancedPortal');
+
+  if(!catId){
+    const catProgress = ADV_CHEM.map(a=>{
+      let done = 0;
+      a.chapters.forEach(cid=>{ if(rec(cid).chapterDone) done++; });
+      return {total:a.chapters.length, done, pct: a.chapters.length? Math.round(done/a.chapters.length*100):0};
+    });
+    box.innerHTML = `
+      ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'Subjects',h:'#/subjects'},{t:'Chemistry',h:'#/subject/chemistry'},{t:'Advanced Chemistry'}])}
+      <div class="phead" style="border-color:rgba(46,211,155,.4);background:linear-gradient(135deg,rgba(46,211,155,.18),#101216 65%)">
+        <div class="pic" style="border:1px solid rgba(46,211,155,.5)">
+          <div style="width:56px;height:56px">${subjectIconSVG('chemistry')}</div>
+        </div>
+        <div class="pinfo">
+          <h1 class="page" style="margin-bottom:4px;font-size:30px">Advanced Chemistry</h1>
+          <p class="sub" style="margin-bottom:0">Three advanced categories. These sessions are separate from the individual chapter one-shots in the Chemistry portal.</p>
+        </div>
+        <button class="btn sm" onclick="go('#/subject/chemistry')">← Back to Chemistry</button>
+      </div>
+      <div class="grid g3">
+        ${ADV_CHEM.map((a,i)=>{
+          const p = catProgress[i];
+          return `<div class="card chapter tilt" style="cursor:pointer" onclick="go('#/advanced/${a.cat}')">
+            ${poster('chemistry', i, 'Advanced')}
+            <div class="ch-body">
+              <h4>${esc(a.n)}</h4>
+              <p class="ts">${esc(a.d)}</p>
+              <div class="bar"><i style="width:${p.pct}%"></i></div>
+              <div class="mini-row"><span>${p.done} / ${p.total} chapters</span><span class="pct">${p.pct}%</span></div>
+              <div class="ch-actions"><button class="btn gold sm">Open Category</button></div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    initTilt(box);
+    return;
+  }
+
+  const cat = ADV_CHEM.find(a=>a.cat===catId);
+  if(!cat){
+    box.innerHTML = crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'Chemistry',h:'#/subject/chemistry'},
+      {t:'Advanced Chemistry',h:'#/advanced'},{t:'Not found'}]) + '<h1 class="page">Category not found</h1>';
+    return;
+  }
+  const chapters = cat.chapters.map(cid=>SUBJECTS.chemistry.chapters.find(c=>c.id===cid)).filter(Boolean);
+  const r = rec(cat.id);
+  const last = r.sessions.filter(x=>x.finish).slice(-1)[0];
+
+  box.innerHTML = `
+    ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'Chemistry',h:'#/subject/chemistry'},
+      {t:'Advanced Chemistry',h:'#/advanced'},{t:cat.n}])}
+    <div class="phead" style="border-color:rgba(46,211,155,.4);background:linear-gradient(135deg,rgba(46,211,155,.16),#101216 65%)">
+      <div class="pinfo">
+        <span class="tag">Advanced Chemistry</span>
+        <h1 class="page" style="margin-bottom:4px;font-size:28px">${esc(cat.n)}</h1>
+        <p class="sub" style="margin-bottom:0">${esc(cat.d)}</p>
+      </div>
+      <div class="btnrow">
+        <button class="btn sm" onclick="go('#/advanced')">← All Categories</button>
+        <button class="btn sm" onclick="go('#/subject/chemistry')">Chemistry</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:26px">
+      <span class="status ${r.status||'none'}">${labelOf(r.status||'none')}</span>
+      <h3 style="font-size:18px;margin:10px 0 8px">${esc(cat.n)} — Advanced Session</h3>
+      <div class="ts">Started: ${fmt(r.sessions.length?r.sessions[0].start:null)} · Finished: ${last?fmt(last.finish):'—'} · Duration: ${last?dur(last.start,last.finish):'—'}</div>
+      <div class="ch-actions" style="margin-top:14px">
+        <button class="btn gold sm" onclick="startById('${cat.id}')">Start Now</button>
+        <button class="btn sm" onclick="finishById('${cat.id}')">Mark Finished</button>
+        <button class="btn sm" onclick="noteById('${cat.id}')">Notes</button>
+      </div>
+    </div>
+
+    <div class="mini-title" style="margin-bottom:12px">Related chapters</div>
+    <div class="grid g3">
+      ${chapters.map((c,i)=>chapterCardHTML('chemistry', c, i)).join('')}
+    </div>`;
+  initTilt(box);
+}
+
+/* ------------------ 11. ENGLISH PORTAL ------------------ */
+function engCatProgress(catKey){
+  const cat = ENG_CATS[catKey];
+  let total = 0, done = 0;
+  cat.groups.forEach(g=>{
+    g.items.forEach(it=>{ total++; if(rec(it.id).chapterDone) done++; });
+  });
+  return {total, done, pct: total? Math.round(done/total*100):0};
+}
+
+function renderEnglish(catKey, groupId){
+  const box = document.getElementById('englishPortal');
+
+  /* --- Landing: category cards only --- */
+  if(!catKey){
+    const st = subjectStats('english');
+    const cards = ENG_ORDER.map(k=>{
+      if(k==='authors'){
+        return `<div class="card cat tilt" onclick="go('#/english/authors')">
+          <div class="ic"><span style="width:16px;height:16px;border-radius:50%;background:#E7C97A;box-shadow:0 0 16px #E7C97A"></span></div>
+          <h3>Poet &amp; Author Names</h3>
+          <p>A searchable directory of every poet and author in Flamingo and Vistas.</p>
+          <div class="catmeta"><span>${ENGLISH.authors.length} entries</span><span class="pct">Directory</span></div>
+        </div>`;
+      }
+      if(k==='pyq'){
+        return `<div class="card cat tilt" onclick="go('#/english/pyq')">
+          <div class="ic"><span style="width:16px;height:16px;border-radius:50%;background:#E4572E;box-shadow:0 0 16px #E4572E"></span></div>
+          <h3>PYQ &amp; Revision</h3>
+          <p>English Core PYQ tracker, sample paper analysis video and revision shortcuts.</p>
+          <div class="catmeta"><span>Tracker + analysis</span><span class="pct">Open</span></div>
+        </div>`;
+      }
+      if(k==='als'){
+        return `<div class="card cat tilt" onclick="go('#/english/als')">
+          <div class="ic"><span style="width:16px;height:16px;border-radius:50%;background:#2ED39B;box-shadow:0 0 16px #2ED39B"></span></div>
+          <h3>ALS Preparation</h3>
+          <p>Assessment of Listening and Speaking — checklist and preparation notes.</p>
+          <div class="catmeta"><span>Linked to Practicals</span><span class="pct">Open</span></div>
+        </div>`;
+      }
+      const p = engCatProgress(k);
+      return `<div class="card cat tilt" onclick="go('#/english/${k}')">
+        <div class="ic"><span style="width:16px;height:16px;border-radius:50%;background:#E7C97A;box-shadow:0 0 16px #E7C97A"></span></div>
+        <h3>${ENG_CATS[k].n}</h3>
+        <p>${esc(ENG_CATS[k].d)}</p>
+        <div class="bar"><i style="width:${p.pct}%"></i></div>
+        <div class="catmeta"><span>${p.done} / ${p.total} completed</span><span class="pct">${p.pct}%</span></div>
+      </div>`;
+    }).join('');
+
+    box.innerHTML = `
+      ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'Subjects',h:'#/subjects'},{t:'English Core'}])}
+      <div class="phead" style="border-color:#E7C97A44;background:linear-gradient(135deg,#E7C97A22,#101216 65%)">
+        <div class="pic" style="border:1px solid #E7C97A55">
+          <div style="width:52px;height:52px">${subjectIconSVG('english')}</div>
+        </div>
+        <div class="pinfo">
+          <h1 class="page" style="margin-bottom:4px;font-size:30px">English Core Portal</h1>
+          <p class="sub" style="margin-bottom:10px">Flamingo, Vistas, poetry, animated lectures, grammar, authors and ALS — each in its own section.</p>
+          <div class="bar" style="max-width:400px"><i style="width:${st.pct}%"></i></div>
+          <div class="ts" style="margin-top:6px">${st.done} / ${st.total} tracked chapter items completed</div>
+        </div>
+        <div class="btnrow">
+          <button class="btn sm" onclick="go('#/pyq/english')">PYQ Tracker</button>
+          <button class="btn sm" onclick="go('#/subject/english')">Chapter Grid</button>
+        </div>
+      </div>
+      <div class="mini-title" style="margin-bottom:12px">Categories</div>
+      <div class="grid g3">${cards}</div>`;
+    initTilt(box);
+    return;
+  }
+
+  /* --- Author directory --- */
+  if(catKey==='authors'){
+    box.innerHTML = `
+      ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'English Core',h:'#/english'},{t:'Poet & Author Names'}])}
+      <h1 class="page" style="font-size:28px">Poet &amp; Author Names</h1>
+      <p class="sub">A searchable directory of every poet and author in Flamingo and Vistas.</p>
+      <div class="toolbar">
+        <select class="field" id="authFilter">
+          <option value="">All categories</option>
+          <option>Flamingo Prose</option><option>Flamingo Poetry</option><option>Vistas</option>
+        </select>
+        <input class="field" id="authSearch" placeholder="Search author or work…">
+        <button class="btn sm" style="margin-left:auto" onclick="go('#/english')">← Back</button>
+      </div>
+      <div class="grid g3" id="authGrid">
+        ${ENGLISH.authors.map(a=>`
+          <div class="card author-card tilt" data-cat="${a.c}" data-txt="${esc((a.n+' '+a.a).toLowerCase())}">
+            <h4>${esc(a.n)}</h4>
+            <p><b style="color:var(--text)">${esc(a.a)}</b></p>
+            <p style="margin-top:6px">${esc(a.b)} · ${esc(a.c)}</p>
+          </div>`).join('')}
+      </div>
+      <div id="authEmpty" class="empty" style="display:none;margin-top:14px">No authors match your filters.</div>
+      <div class="note">Author and poet names are user-supplied reference data. Verify against your official textbook before relying on them.</div>`;
+    const af = document.getElementById('authFilter'), as = document.getElementById('authSearch');
+    const ae = document.getElementById('authEmpty');
+    function f(){
+      let v = 0;
+      document.querySelectorAll('#authGrid .author-card').forEach(c=>{
+        const okCat = !af.value || c.getAttribute('data-cat')===af.value;
+        const okTxt = c.getAttribute('data-txt').includes((as.value||'').toLowerCase());
+        const ok = okCat && okTxt;
+        c.style.display = ok?'':'none';
+        if(ok) v++;
+      });
+      ae.style.display = v?'none':'';
+    }
+    af.addEventListener('change',f); as.addEventListener('input',f);
+    initTilt(box);
+    return;
+  }
+
+  /* --- PYQ & Revision shortcut --- */
+  if(catKey==='pyq'){
+    box.innerHTML = `
+      ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'English Core',h:'#/english'},{t:'PYQ & Revision'}])}
+      <h1 class="page" style="font-size:28px">PYQ &amp; Revision</h1>
+      <p class="sub">English Core PYQ tracking and sample-paper video analysis.</p>
+      <div class="grid g2" style="margin-bottom:24px">
+        <div class="card">
+          <span class="tag">PYQ Tracker</span>
+          <p class="ts" style="margin-bottom:14px">Open the year-wise tracker for every English chapter.</p>
+          <button class="btn gold sm" onclick="go('#/pyq/english')">Open PYQ Tracker</button>
+        </div>
+        <div class="card">
+          <span class="tag">Sample Paper Analysis</span>
+          <p class="ts" style="margin-bottom:14px">Watch the video analysis for English Core.</p>
+          <button class="btn gold sm" onclick="startById('an-eng')">Watch Analysis</button>
+        </div>
+      </div>
+      <button class="btn sm" onclick="go('#/english')">← Back to English</button>`;
+    initTilt(box);
+    return;
+  }
+
+  /* --- ALS preparation --- */
+  if(catKey==='als'){
+    const p = PRACTICALS.find(x=>x.id==='pr-eng');
+    box.innerHTML = `
+      ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'English Core',h:'#/english'},{t:'ALS Preparation'}])}
+      <h1 class="page" style="font-size:28px">English ALS Preparation</h1>
+      <p class="sub">Assessment of Listening and Speaking — preparation checklist.</p>
+      <div class="note">ALS assessment details below are student-supplied planning figures. Verify against the current official assessment scheme.</div>
+      <div class="grid g2" style="margin-bottom:22px">
+        <div class="card">${chartHTML(p.rows,p.total)}</div>
+        <div class="card">${tableHTML(p.rows,p.total)}</div>
+      </div>
+      <div class="mini-title" style="margin-bottom:12px">Preparation checklist</div>
+      <div class="grid g3">
+        ${p.items.map((it,i)=>{
+          const id = 'als-'+i;
+          const r = rec(id);
+          return `<div class="card chapter tilt">
+            ${poster('english', i, 'ALS')}
+            <div class="ch-body">
+              <h4>${esc(it)}</h4>
+              <span class="status ${r.status||'none'}">${labelOf(r.status||'none')}</span>
+              <label class="chk"><input type="checkbox" ${r.chapterDone?'checked':''} onchange="toggleChapter('${id}', this.checked)"> Prepared</label>
+              <div class="ch-actions">
+                <button class="btn sm" onclick="openNote('${id}','${esc(it)}')">Notes</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="margin-top:22px"><button class="btn sm" onclick="go('#/english')">← Back to English</button></div>`;
+    initTilt(box);
+    return;
+  }
+
+  /* --- Grouped categories: oneshot / complete / animated / grammar --- */
+  const cat = ENG_CATS[catKey];
+  if(!cat){
+    box.innerHTML = crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'English Core',h:'#/english'},{t:'Not found'}]) +
+      '<h1 class="page">Section not found</h1>';
+    return;
+  }
+
+  const multiGroup = cat.groups.length > 1;
+
+  if(multiGroup && !groupId){
+    box.innerHTML = `
+      ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'English Core',h:'#/english'},{t:cat.n}])}
+      <h1 class="page" style="font-size:28px">${esc(cat.n)}</h1>
+      <p class="sub">${esc(cat.d)}</p>
+      <div class="grid g3">
+        ${cat.groups.map(g=>{
+          let done = 0;
+          g.items.forEach(it=>{ if(rec(it.id).chapterDone) done++; });
+          const pct = g.items.length? Math.round(done/g.items.length*100):0;
+          return `<div class="card cat tilt" onclick="go('#/english/${catKey}/${g.id}')">
+            <div class="ic"><span style="width:16px;height:16px;border-radius:50%;background:#E7C97A;box-shadow:0 0 16px #E7C97A"></span></div>
+            <h3>${esc(g.n)}</h3>
+            <p>${g.items.length} lecture${g.items.length===1?'':'s'}</p>
+            <div class="bar"><i style="width:${pct}%"></i></div>
+            <div class="catmeta"><span>${done} / ${g.items.length} completed</span><span class="pct">${pct}%</span></div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="margin-top:22px"><button class="btn sm" onclick="go('#/english')">← Back to English</button></div>`;
+    initTilt(box);
+    return;
+  }
+
+  const group = multiGroup ? cat.groups.find(g=>g.id===groupId) : cat.groups[0];
+  if(!group){
+    box.innerHTML = crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'English Core',h:'#/english'},
+      {t:cat.n,h:'#/english/'+catKey},{t:'Not found'}]) + '<h1 class="page">Section not found</h1>';
+    return;
+  }
+
+  box.innerHTML = `
+    ${crumbs(multiGroup
+      ? [{t:'Dashboard',h:'#/dashboard'},{t:'English Core',h:'#/english'},{t:cat.n,h:'#/english/'+catKey},{t:group.n}]
+      : [{t:'Dashboard',h:'#/dashboard'},{t:'English Core',h:'#/english'},{t:cat.n}])}
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px">
+      <h1 class="page" style="font-size:28px;margin:0">${esc(group.n)}</h1>
+      <button class="btn sm" style="margin-left:auto" onclick="go('#/english${multiGroup?'/'+catKey:''}')">← Back</button>
+    </div>
+    <div class="grid g3">
+      ${group.items.map((it,i)=>simpleCardHTML('english', it, i)).join('')}
+    </div>`;
+  initTilt(box);
+}
+
+/* ------------------ 12. SIMPLE GRID PORTAL ------------------ */
+function renderGridPortal(boxId, title, sub, arr, subKey){
+  const box = document.getElementById(boxId);
+  if(!box) return;
+  box.innerHTML = `
+    ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:title}])}
+    <h1 class="page">${esc(title)}</h1>
+    <p class="sub">${esc(sub)}</p>
+    <div class="grid g3">${arr.map((x,i)=>simpleCardHTML(subKey,x,i)).join('')}</div>`;
+  initTilt(box);
+}
+
+/* ------------------ 13. DASHBOARD ------------------ */
+function renderDashboard(){
+  document.getElementById('dashName').textContent = profile.name || 'Student';
+  document.getElementById('dashDate').textContent = new Date().toLocaleDateString(undefined,
+    {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  setAvatar(document.getElementById('dashAvatar'));
+
+  /* subjects */
+  document.getElementById('dashSubjects').innerHTML = Object.keys(SUBJECTS).map(k=>{
+    const s = SUBJECTS[k], st = subjectStats(k);
+    return `<div class="card subj-card tilt" onclick="go('#/subject/${k}')" style="padding:14px">
+      <div class="art" style="height:76px;background:linear-gradient(135deg,${s.accent}22,#0f1216)">
+        <div style="width:46px;height:46px">${subjectIconSVG(k)}</div></div>
+      <h3 style="font-size:14px">${s.name}</h3>
+      <div class="bar"><i style="width:${st.pct}%"></i></div>
+      <div class="meta" style="font-size:11px"><span>${st.done}/${st.total}</span><span class="pct">${st.pct}%</span></div>
+    </div>`;
+  }).join('');
+
+  /* continue learning */
+  renderContinueCard();
+
+  /* stats */
+  const o = overallStats(), pq = pyqStats(), fm = focusMinutes();
+  document.getElementById('dashStats').innerHTML = `
+    <div class="stat"><b>${o.pct}%</b><span>Overall progress</span></div>
+    <div class="stat"><b>${o.done}/${o.total}</b><span>Chapters done</span></div>
+    <div class="stat"><b>${pq.pct}%</b><span>PYQ coverage</span></div>
+    <div class="stat"><b>${o.lectures}</b><span>Lectures finished</span></div>
+    <div class="stat"><b>${Math.floor(o.minutes/60)}h ${o.minutes%60}m</b><span>Recorded duration</span></div>
+    <div class="stat"><b>${Math.floor(fm/60)}h ${fm%60}m</b><span>Focus time</span></div>
+    <div class="stat"><b>${focusSessions.length}</b><span>Focus sessions</span></div>
+    <div class="stat"><b>${events.length}</b><span>Calendar events</span></div>
+  `;
+
+  /* goal */
+  const today = ymd(new Date());
+  let todayLectures = 0;
+  Object.values(progress).forEach(r=>{
+    (r.sessions||[]).forEach(s=>{ if(s.start && ymd(new Date(s.start))===today) todayLectures++; });
+  });
+  const goal = settings.goal||4;
+  const gp = Math.min(100, Math.round(todayLectures/goal*100));
+  document.getElementById('goalBar').style.width = gp+'%';
+  document.getElementById('goalTxt').textContent = todayLectures+' / '+goal+' lectures';
+
+  /* today + upcoming */
+  const todayEvs = events.filter(e=>e.date===today);
+  const up = events.filter(e=>!e.done && e.date>today)
+    .sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||''))).slice(0,5);
+  let evHTML = '';
+  if(todayEvs.length){
+    evHTML += `<div class="mini-title" style="margin-bottom:8px">Today</div>` + todayEvs.map(e=>`
+      <div class="folder-item">
+        <div><b style="font-size:13px">${esc(e.title)}</b>
+        <div class="ts">${esc(e.time||'All day')} ${e.subject?'· '+esc(e.subject):''}</div></div>
+        <button class="btn sm" onclick="toggleEventDone('${e.id}')">${e.done?'Undo':'Done'}</button>
+      </div>`).join('');
+  }
+  if(up.length){
+    evHTML += `<div class="mini-title" style="margin:14px 0 8px">Upcoming</div>` + up.map(e=>`
+      <div class="folder-item">
+        <div><b style="font-size:13px">${esc(e.title)}</b>
+        <div class="ts">${esc(e.date)} ${esc(e.time||'')} ${e.subject?'· '+esc(e.subject):''}</div></div>
+        <button class="btn sm" onclick="toggleEventDone('${e.id}')">Done</button>
+      </div>`).join('');
+  }
+  document.getElementById('dashEvents').innerHTML = evHTML ||
+    '<div class="empty">Nothing scheduled. Add a task in the Calendar.</div>';
+
+  /* recent */
+  const started = allStartedSessions().slice(0,6);
+  document.getElementById('recentStart').innerHTML = started.length ? started.map(s=>
+    `<div style="margin-bottom:8px">• ${esc(findTitle(s.id))} <span class="ts">— ${fmt(s.start)}</span></div>`).join('')
+    : '<div class="ts">No lectures started yet.</div>';
+
+  const doneList = Object.entries(progress).filter(([k,v])=>v.chapterDone).slice(0,6);
+  document.getElementById('recentDone').innerHTML = doneList.length
+    ? doneList.map(([k])=>`<div style="margin-bottom:8px">• ${esc(findTitle(k))}</div>`).join('')
+    : '<div class="ts">No chapters completed yet.</div>';
+
+  /* quick portals */
+  const qa = [
+    ['Physics','#/subject/physics'],['Chemistry','#/subject/chemistry'],
+    ['Mathematics','#/subject/maths'],['English','#/english'],
+    ['Physical Education','#/subject/pe'],['Advanced Chemistry','#/advanced'],
+    ['Revision','#/revision'],['Advance Push','#/advance'],
+    ['Sample Paper Analysis','#/analysis'],['Practicals','#/practicals'],
+    ['PYQ Tracker','#/pyq'],['Weightage','#/weightage'],
+    ['Focus Mode','#/focus'],['Calendar','#/calendar'],['Folders','#/folders']
+  ];
+  document.getElementById('quickActions').innerHTML = qa.map(q=>
+    `<button class="btn sm" onclick="go('${q[1]}')">${q[0]}</button>`).join('');
+
+  initTilt(document.getElementById('v-dashboard'));
+}
+
+function renderContinueCard(){
+  const box = document.getElementById('continueCard');
+  if(!box) return;
+  const un = unfinishedSessions();
+
+  if(un.length){
+    const {id, start} = un[0];
+    const it = findItem(id);
+    const r = rec(id);
+    if(it){
+      box.innerHTML = `<div class="cl">
+        <div class="cl-info">
+          <span class="tag">Continue Learning</span>
+          <h3 style="font-size:19px;margin:4px 0 6px">${esc(it.n)}</h3>
+          <div class="ts">${esc(it.s)} · Started ${fmt(start)} · Status: ${labelOf(r.status)}</div>
+        </div>
+        <div class="btnrow">
+          <button class="btn gold" onclick="startById('${id}')">Resume</button>
+          <button class="btn" onclick="finishById('${id}')">Mark Finished</button>
+          <button class="btn" onclick="go('#/focus')">Focus Mode</button>
+        </div>
+      </div>`;
+      return;
+    }
+  }
+
+  const recent = allStartedSessions().filter(s=>s.finish)[0];
+  if(recent){
+    const it = findItem(recent.id);
+    if(it){
+      box.innerHTML = `<div class="cl">
+        <div class="cl-info">
+          <span class="tag">Pick up where you left off</span>
+          <h3 style="font-size:19px;margin:4px 0 6px">${esc(it.n)}</h3>
+          <div class="ts">${esc(it.s)} · Last studied ${fmt(recent.start)} · Status: ${labelOf(rec(recent.id).status)}</div>
+        </div>
+        <div class="btnrow">
+          <button class="btn gold" onclick="startById('${recent.id}')">Open Lecture</button>
+          <button class="btn" onclick="go('#/focus')">Focus Mode</button>
+        </div>
+      </div>`;
+      return;
+    }
+  }
+
+  box.innerHTML = `<div class="empty">No lecture in progress yet.
+    <button class="btn gold sm" style="margin-left:10px" onclick="go('#/subjects')">Browse Subjects</button></div>`;
+}
+
+/* ------------------ 14. PRACTICALS ------------------ */
+function chartHTML(rows, total){
+  const max = Math.max(...rows.map(r=>r[1]),1);
+  return `<div class="mini-title" style="margin-bottom:12px">Marks distribution (total ${total})</div>
+    <div class="chart">${rows.map(r=>`
+      <div class="crow"><span class="lab">${esc(r[0])}</span>
+        <div class="ctrack"><i style="width:${Math.round(r[1]/max*100)}%"></i></div>
+        <span class="val">${r[1]}</span></div>`).join('')}</div>`;
+}
+function tableHTML(rows,total){
+  return `<div class="tblwrap"><table><thead><tr><th>Component</th><th class="c">Marks</th></tr></thead>
+    <tbody>${rows.map(r=>`<tr><td>${esc(r[0])}</td><td class="c">${r[1]}</td></tr>`).join('')}
+    <tr><td><b>Total</b></td><td class="c"><b>${total}</b></td></tr></tbody></table></div>`;
+}
+function pracPosterKey(id){
+  return id==='pr-phy'?'physics': id==='pr-che'?'chemistry': id==='pr-pe'?'pe': id==='pr-mat'?'maths':'english';
+}
+
+function renderPracticals(id){
+  const box = document.getElementById('pracBody');
+
+  if(!id){
+    const feat = rec('prac-feat');
+    const lastFeat = feat.sessions.filter(s=>s.finish).slice(-1)[0];
+    box.innerHTML = `
+      ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'Practicals'}])}
+      <h1 class="page">Practicals</h1>
+      <p class="sub">Preparation portals for Physics, Chemistry, Physical Education, Mathematics internal assessment and English ALS.</p>
+
+      <div class="card" style="margin-bottom:22px;border-color:var(--line)">
+        <span class="tag">Featured Resource</span>
+        <div class="cl">
+          <div class="cl-info">
+            <h3 style="font-size:20px;margin-bottom:6px">Practicals 30/30</h3>
+            <p class="ts">Supplied video title — not a guarantee of marks.</p>
+            <div class="ts" style="margin-top:6px">Started: ${fmt(feat.sessions.length?feat.sessions[0].start:null)} · Finished: ${lastFeat?fmt(lastFeat.finish):'—'}</div>
+          </div>
+          <div class="btnrow">
+            <button class="btn gold sm" onclick="startById('prac-feat')">Start Now</button>
+            <button class="btn sm" onclick="finishById('prac-feat')">Mark Finished</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        <b>Verification notice:</b> The marks distributions shown in these portals are student-supplied planning figures,
+        not verified official CBSE weightings. Always confirm against the current official curriculum before relying on them.
+      </div>
+
+      <div class="grid g3">
+        ${PRACTICALS.map((p,i)=>{
+          let done = 0;
+          p.items.forEach((_,j)=>{ if(rec(p.id+'-'+j).chapterDone) done++; });
+          const pct = p.items.length? Math.round(done/p.items.length*100):0;
+          return `<div class="card chapter tilt" style="cursor:pointer" onclick="go('#/practicals/${p.id}')">
+            ${poster(pracPosterKey(p.id), i, 'Practical')}
+            <div class="ch-body">
+              <h4>${esc(p.n)}</h4>
+              <p class="ts">Total ${p.total} marks · ${p.rows.length} components</p>
+              <div class="bar"><i style="width:${pct}%"></i></div>
+              <div class="mini-row"><span>${done} / ${p.items.length} prepared</span><span class="pct">${pct}%</span></div>
+              <div class="ch-actions"><button class="btn gold sm">Open</button></div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    initTilt(box);
+    return;
+  }
+
+  const p = PRACTICALS.find(x=>x.id===id);
+  if(!p){
+    box.innerHTML = crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'Practicals',h:'#/practicals'},{t:'Not found'}]) +
+      '<h1 class="page">Assessment not found</h1>';
+    return;
+  }
+
+  box.innerHTML = `
+    ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'Practicals',h:'#/practicals'},{t:p.n}])}
+    <div class="phead">
+      <div class="pinfo">
+        <span class="tag">Practicals</span>
+        <h1 class="page" style="margin-bottom:4px;font-size:28px">${esc(p.n)}</h1>
+        <p class="sub" style="margin-bottom:0">Total ${p.total} marks across ${p.rows.length} components.</p>
+      </div>
+      <button class="btn sm" onclick="go('#/practicals')">← All Practicals</button>
+    </div>
+
+    <div class="note">
+      <b>Verification notice:</b> These marks distributions are student-supplied planning figures, not verified official CBSE weightings.
+      Confirm against the current official curriculum before relying on them.
+    </div>
+
+    <div class="grid g2" style="margin-bottom:24px">
+      <div class="card">${chartHTML(p.rows,p.total)}</div>
+      <div class="card">${tableHTML(p.rows,p.total)}</div>
+    </div>
+
+    <div class="mini-title" style="margin-bottom:12px">Preparation checklist</div>
+    <div class="grid g3">
+      ${p.items.map((it,i)=>{
+        const cid = p.id+'-'+i;
+        const r = rec(cid);
+        return `<div class="card chapter tilt">
+          ${poster(pracPosterKey(p.id), i, 'Prep')}
+          <div class="ch-body">
+            <h4>${esc(it)}</h4>
+            <span class="status ${r.status||'none'}">${labelOf(r.status||'none')}</span>
+            <label class="chk"><input type="checkbox" ${r.chapterDone?'checked':''} onchange="toggleChapter('${cid}',this.checked)"> Prepared</label>
+            <div class="ch-actions">
+              <button class="btn sm" onclick="openNote('${cid}','${esc(it)}')">Notes</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  initTilt(box);
+}
+
+/* ------------------ 15. WEIGHTAGE ------------------ */
+function renderWeightage(key){
+  const box = document.getElementById('wBody');
+
+  if(!key){
+    box.innerHTML = `
+      ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'Weightage'}])}
+      <h1 class="page">Weightage</h1>
+      <p class="sub">Interactive charts and tables, one subject at a time.</p>
+      <div class="note"><b>Verification status: unverified.</b> All marks distributions are user-supplied planning figures.
+      They are not official CBSE weightings. Verify against the current official curriculum before relying on them.</div>
+      <div class="grid g3">
+        ${Object.keys(WEIGHTAGE).map(k=>{
+          const w = WEIGHTAGE[k];
+          const s = SUBJECTS[k] || {accent:'#D4AF37', name:w.name};
+          const max = Math.max(...w.rows.map(r=>r[1]),1);
+          return `<div class="card cat tilt" onclick="go('#/weightage/${k}')">
+            <div class="ic" style="border-color:${s.accent}55">
+              <span style="width:16px;height:16px;border-radius:50%;background:${s.accent};box-shadow:0 0 16px ${s.accent}"></span>
+            </div>
+            <h3>${esc(w.name)}</h3>
+            <p>Theory total ${w.total} marks · ${w.rows.length} categories</p>
+            <div class="chart" style="margin:6px 0 2px">
+              ${w.rows.slice(0,3).map(r=>`
+                <div class="crow" style="grid-template-columns:1fr 60px 30px">
+                  <span class="lab" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r[0])}</span>
+                  <div class="ctrack" style="height:14px"><i style="width:${Math.round(r[1]/max*100)}%"></i></div>
+                  <span class="val" style="font-size:11px">${r[1]}</span>
+                </div>`).join('')}
+            </div>
+            <div class="catmeta"><span>Tap to open</span><span class="pct">${w.total} marks</span></div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    initTilt(box);
+    return;
+  }
+
+  const w = WEIGHTAGE[key];
+  if(!w){
+    box.innerHTML = crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'Weightage',h:'#/weightage'},{t:'Not found'}]) +
+      '<h1 class="page">Subject not found</h1>';
+    return;
+  }
+  const max = Math.max(...w.rows.map(r=>r[1]),1);
+  box.innerHTML = `
+    ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'Weightage',h:'#/weightage'},{t:w.name}])}
+    <div class="phead">
+      <div class="pinfo">
+        <span class="tag">${esc(w.name)} — Theory ${w.total} marks</span>
+        <h1 class="page" style="margin-bottom:4px;font-size:28px">${esc(w.name)} Weightage</h1>
+        <p class="sub" style="margin-bottom:0">Marks distribution by unit or section.</p>
+      </div>
+      <button class="btn sm" onclick="go('#/weightage')">← All Subjects</button>
+    </div>
+    <div class="note"><b>Verification status: unverified.</b> These values are user-supplied planning figures and are not official CBSE weightings.</div>
+    <div class="grid g2">
+      <div class="card">
+        <div class="mini-title">Chart</div>
+        <div class="chart">${w.rows.map(r=>`
+          <div class="crow"><span class="lab">${esc(r[0])}</span>
+            <div class="ctrack"><i style="width:${Math.round(r[1]/max*100)}%"></i></div>
+            <span class="val">${r[1]}</span></div>`).join('')}</div>
+        <div class="ts">Bar lengths are scaled to the largest value in this subject (${max} marks) so bars are comparable within the chart.</div>
+      </div>
+      <div class="card">
+        <div class="mini-title">Data table</div>
+        ${tableHTML(w.rows, w.total)}
+      </div>
+    </div>`;
+  initTilt(box);
+}
+
+/* ------------------ 16. PYQ ------------------ */
+function renderPyq(key){
+  const box = document.getElementById('pyqBody');
+
+  if(!key){
+    const pq = pyqStats();
+    box.innerHTML = `
+      ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'PYQ Tracker'}])}
+      <h1 class="page">PYQ Tracker</h1>
+      <p class="sub">Ten year slots per chapter. A checked box means you have completed or reviewed that year slot — it does not verify that a specific question appeared in a specific year.</p>
+      <div class="grid g3" style="margin-bottom:24px">
+        <div class="card stat"><b>${pq.done}/${pq.total}</b><span>Total slots checked</span></div>
+        <div class="card stat"><b>${pq.pct}%</b><span>Overall coverage</span></div>
+        <div class="card stat"><b>${Object.keys(SUBJECTS).length}</b><span>Subjects tracked</span></div>
+      </div>
+      <div class="mini-title" style="margin-bottom:12px">Choose a subject</div>
+      <div class="grid g3">
+        ${Object.keys(SUBJECTS).map(k=>{
+          const s = SUBJECTS[k];
+          const st = subjectPyqStats(k);
+          return `<div class="card cat tilt" onclick="go('#/pyq/${k}')">
+            <div class="ic" style="border-color:${s.accent}55">
+              <span style="width:16px;height:16px;border-radius:50%;background:${s.accent};box-shadow:0 0 16px ${s.accent}"></span>
+            </div>
+            <h3>${esc(s.name)}</h3>
+            <p>${s.chapters.length} chapters × ${PYQ_YEARS.length} year slots</p>
+            <div class="bar"><i style="width:${st.pct}%"></i></div>
+            <div class="catmeta"><span>${st.done} / ${st.total} checked</span><span class="pct">${st.pct}%</span></div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    initTilt(box);
+    return;
+  }
+
+  const s = SUBJECTS[key];
+  if(!s){
+    box.innerHTML = crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'PYQ Tracker',h:'#/pyq'},{t:'Not found'}]) +
+      '<h1 class="page">Subject not found</h1>';
+    return;
+  }
+  const st = subjectPyqStats(key);
+  box.innerHTML = `
+    ${crumbs([{t:'Dashboard',h:'#/dashboard'},{t:'PYQ Tracker',h:'#/pyq'},{t:s.name}])}
+    <div class="phead" style="border-color:${s.accent}44">
+      <div class="pinfo">
+        <span class="tag">PYQ Tracker</span>
+        <h1 class="page" style="margin-bottom:8px;font-size:28px">${esc(s.name)}</h1>
+        <div class="bar" style="max-width:420px"><i id="pyqHeadBar" style="width:${st.pct}%"></i></div>
+        <div class="ts" style="margin-top:6px"><span id="pyqHeadTxt">${st.done} / ${st.total}</span> year slots checked · <span id="pyqHeadPct">${st.pct}%</span></div>
+      </div>
+      <button class="btn sm" onclick="go('#/pyq')">← All Subjects</button>
+    </div>
+
+    <div class="toolbar">
+      <input class="field" id="pyqSearch" placeholder="Filter chapters…" style="flex:1;min-width:220px">
+      <button class="btn sm" id="pyqExpand">Expand all</button>
+      <button class="btn sm" id="pyqCollapse">Collapse all</button>
+    </div>
+
+    <div id="pyqList">
+      ${s.chapters.map(c=>{
+        const arr = pyq[c.id]||[];
+        const done = arr.filter(Boolean).length;
+        return `<details class="pyq-ch" data-cid="${c.id}">
+          <summary>
+            <span class="nm">${esc(c.n)}</span>
+            <span class="pyq-pill">${done}/${PYQ_YEARS.length}</span>
+          </summary>
+          <div class="pyq-years">
+            ${PYQ_YEARS.map((y,i)=>`<label class="pyq-y">
+              <input type="checkbox" data-cid="${c.id}" data-i="${i}" ${arr[i]?'checked':''}> ${y}
+            </label>`).join('')}
+          </div>
+        </details>`;
+      }).join('')}
+    </div>
+    <div id="pyqEmpty" class="empty" style="display:none;margin-top:14px">No chapters match your filter.</div>
+    <div class="note">A checked box means you have completed or reviewed that year slot for that chapter. It does not verify that a specific question appeared in that specific year.</div>`;
+
+  const list = document.getElementById('pyqList');
+  list.addEventListener('change', e=>{
+    const cb = e.target.closest('input[type=checkbox]');
+    if(!cb) return;
+    const cid = cb.getAttribute('data-cid');
+    const i = +cb.getAttribute('data-i');
+    if(!pyq[cid]) pyq[cid] = new Array(PYQ_YEARS.length).fill(false);
+    while(pyq[cid].length < PYQ_YEARS.length) pyq[cid].push(false);
+    pyq[cid][i] = cb.checked;
+    savePyq();
+    const det = cb.closest('details');
+    const done = pyq[cid].filter(Boolean).length;
+    det.querySelector('.pyq-pill').textContent = done+'/'+PYQ_YEARS.length;
+    const nst = subjectPyqStats(key);
+    const hb = document.getElementById('pyqHeadBar');
+    if(hb) hb.style.width = nst.pct+'%';
+    const ht = document.getElementById('pyqHeadTxt');
+    if(ht) ht.textContent = nst.done+' / '+nst.total;
+    const hp = document.getElementById('pyqHeadPct');
+    if(hp) hp.textContent = nst.pct+'%';
+  });
+
+  const search = document.getElementById('pyqSearch');
+  const empty = document.getElementById('pyqEmpty');
+  search.addEventListener('input', ()=>{
+    const q = search.value.toLowerCase();
+    let v = 0;
+    list.querySelectorAll('.pyq-ch').forEach(el=>{
+      const ok = el.querySelector('.nm').textContent.toLowerCase().includes(q);
+      el.style.display = ok ? '' : 'none';
+      if(ok) v++;
+    });
+    empty.style.display = v ? 'none' : '';
+  });
+  document.getElementById('pyqExpand').onclick = ()=> list.querySelectorAll('details').forEach(d=>{ if(d.style.display!=='none') d.open = true; });
+  document.getElementById('pyqCollapse').onclick = ()=> list.querySelectorAll('details').forEach(d=>d.open = false);
+
+  initTilt(box);
+}
+
+/* ------------------ 17. CALENDAR ------------------ */
+let calDate = new Date();
+function renderCalendar(){
+  const y = calDate.getFullYear(), m = calDate.getMonth();
+  document.getElementById('calTitle').textContent = calDate.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  const first = new Date(y,m,1).getDay();
+  const days = new Date(y,m+1,0).getDate();
+  const todayStr = ymd(new Date());
+  let html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="dow">${d}</div>`).join('');
+  for(let i=0;i<first;i++) html += '<div class="cal-day empty"></div>';
+  for(let d=1;d<=days;d++){
+    const ds = y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const evs = events.filter(e=>e.date===ds);
+    html += `<div class="cal-day ${ds===todayStr?'today':''}" onclick="dayClick('${ds}')">
+      <b>${d}</b>
+      ${evs.slice(0,3).map(e=>`<div class="ev ${e.done?'done':''}">${esc(e.title)}</div>`).join('')}
+      ${evs.length>3?`<div class="ts">+${evs.length-3} more</div>`:''}
+    </div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+
+  const up = events.filter(e=>!e.done).sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||'')));
+  document.getElementById('calUpcoming').innerHTML = up.length ? up.map(e=>`
+    <div class="folder-item">
+      <div><b style="font-size:13.5px">${esc(e.title)}</b>
+        <div class="ts">${esc(e.date)} ${esc(e.time||'')} ${e.subject?'· '+esc(e.subject):''}${e.notes?' · '+esc(e.notes):''}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn sm" onclick="editEvent('${e.id}')">Edit</button>
+        <button class="btn sm" onclick="toggleEventDone('${e.id}')">${e.done?'Undo':'Done'}</button>
+        <button class="btn sm danger" onclick="delEvent('${e.id}')">Delete</button>
+      </div>
+    </div>`).join('') : '<div class="empty">No events yet. Add your first study task.</div>';
+}
+function dayClick(ds){ openEventModal(null, ds); }
+function openEventModal(id, presetDate){
+  const e = id ? events.find(x=>x.id===id) : null;
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `<h3>${e?'Edit Event':'New Event'}</h3>
+    <label class="mini-title">Title</label>
+    <input class="field" id="evTitle" style="width:100%" value="${e?esc(e.title):''}" placeholder="e.g. Complete Ray Optics">
+    <label class="mini-title" style="display:block;margin-top:12px">Date</label>
+    <input class="field" type="date" id="evDate" style="width:100%" value="${e?e.date:(presetDate||ymd(new Date()))}">
+    <label class="mini-title" style="display:block;margin-top:12px">Time</label>
+    <input class="field" type="time" id="evTime" style="width:100%" value="${e?(e.time||''):''}">
+    <label class="mini-title" style="display:block;margin-top:12px">Subject</label>
+    <select class="field" id="evSub" style="width:100%">
+      <option value="">None</option>
+      ${Object.keys(SUBJECTS).map(k=>`<option ${e&&e.subject===SUBJECTS[k].name?'selected':''}>${SUBJECTS[k].name}</option>`).join('')}
+      <option ${e&&e.subject==='Revision'?'selected':''}>Revision</option>
+      <option ${e&&e.subject==='Test'?'selected':''}>Test</option>
+      <option ${e&&e.subject==='Practical'?'selected':''}>Practical</option>
+    </select>
+    <label class="mini-title" style="display:block;margin-top:12px">Notes</label>
+    <textarea class="field" id="evNotes" placeholder="Optional notes…">${e?esc(e.notes||''):''}</textarea>
+    <div class="mrow">
+      <button class="btn sm" onclick="closeOverlay('modalOverlay')">Cancel</button>
+      <button class="btn gold sm" id="evSave">Save Event</button>
+    </div>`;
+  openOverlay('modalOverlay');
+  document.getElementById('evSave').onclick = ()=>{
+    const title = document.getElementById('evTitle').value.trim();
+    if(!title){ toast('Title is required'); return; }
+    const data = {
+      title,
+      date: document.getElementById('evDate').value,
+      time: document.getElementById('evTime').value,
+      subject: document.getElementById('evSub').value,
+      notes: document.getElementById('evNotes').value
+    };
+    if(e){ Object.assign(e, data); }
+    else { events.push(Object.assign({id:uid('ev'), done:false}, data)); }
+    saveEvents(); closeOverlay('modalOverlay'); renderCalendar(); toast('Event saved');
+  };
+}
+function editEvent(id){ openEventModal(id); }
+function delEvent(id){
+  if(!confirm('Delete this event?')) return;
+  events = events.filter(e=>e.id!==id); saveEvents(); renderCalendar(); toast('Event deleted');
+}
+function toggleEventDone(id){
+  const e = events.find(x=>x.id===id); if(!e) return;
+  e.done = !e.done; saveEvents(); renderCalendar();
+}
+document.getElementById('calPrev').onclick = ()=>{ calDate.setMonth(calDate.getMonth()-1); renderCalendar(); };
+document.getElementById('calNext').onclick = ()=>{ calDate.setMonth(calDate.getMonth()+1); renderCalendar(); };
+document.getElementById('calToday').onclick = ()=>{ calDate = new Date(); renderCalendar(); };
+document.getElementById('calAdd').onclick = ()=> openEventModal(null);
+
+/* ------------------ 18. FOLDERS ------------------ */
+function renderFolders(){
+  const q = (document.getElementById('folderSearch').value||'').toLowerCase();
+  const list = folders.filter(f=>f.name.toLowerCase().includes(q));
+  const box = document.getElementById('folderGrid');
+  box.innerHTML = list.length ? list.map(f=>`
+    <div class="card tilt">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+        <div>
+          <div style="font-size:26px;margin-bottom:6px">${f.icon||'📁'}</div>
+          <h3 style="font-size:16px;margin-bottom:4px">${esc(f.name)}</h3>
+          <div class="ts">${(f.items||[]).length} item(s)</div>
+        </div>
+      </div>
+      ${f.notes?`<p class="ts" style="margin-top:10px">${esc(f.notes)}</p>`:''}
+      <div class="ch-actions" style="margin-top:14px">
+        <button class="btn sm" onclick="addToFolder('${f.id}')">+ Add Item</button>
+        <button class="btn sm" onclick="viewFolder('${f.id}')">View</button>
+        <button class="btn sm" onclick="renameFolder('${f.id}')">Rename</button>
+        <button class="btn sm danger" onclick="delFolder('${f.id}')">Delete</button>
+      </div>
+    </div>`).join('') : '<div class="empty">No folders yet. Create one to organise your study.</div>';
+  initTilt(box);
+}
+document.getElementById('folderSearch').oninput = renderFolders;
+document.getElementById('folderAdd').onclick = ()=>{
+  const name = prompt('Folder name:','Revision');
+  if(!name) return;
+  folders.push({id:uid('fd'), name:name.trim(), icon:'📁', items:[], notes:''});
+  saveFolders(); renderFolders(); toast('Folder created');
+};
+function renameFolder(id){
+  const f = folders.find(x=>x.id===id);
+  const name = prompt('New name:', f.name);
+  if(!name) return;
+  f.name = name.trim(); saveFolders(); renderFolders();
+}
+function delFolder(id){
+  if(!confirm('Delete this folder? Chapters and videos are not affected.')) return;
+  folders = folders.filter(f=>f.id!==id); saveFolders(); renderFolders(); toast('Folder deleted');
+}
+function addToFolder(id){
+  const f = folders.find(x=>x.id===id);
+  const opts = [];
+  Object.keys(SUBJECTS).forEach(k=>{
+    SUBJECTS[k].chapters.forEach(c=>opts.push({id:c.id, n:SUBJECTS[k].name+' — '+c.n}));
+  });
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `<h3>Add Item to "${esc(f.name)}"</h3>
+    <select class="field" id="foldItem" style="width:100%">
+      ${opts.map(o=>`<option value="${o.id}">${esc(o.n)}</option>`).join('')}
+    </select>
+    <div class="mrow">
+      <button class="btn sm" onclick="closeOverlay('modalOverlay')">Cancel</button>
+      <button class="btn gold sm" id="foldAdd">Add</button>
+    </div>`;
+  openOverlay('modalOverlay');
+  document.getElementById('foldAdd').onclick = ()=>{
+    const v = document.getElementById('foldItem').value;
+    const n = document.getElementById('foldItem').selectedOptions[0].textContent;
+    if(!f.items.some(x=>x.id===v)) f.items.push({id:v, n:n});
+    saveFolders(); closeOverlay('modalOverlay'); renderFolders(); toast('Added to folder');
+  };
+}
+function viewFolder(id){
+  const f = folders.find(x=>x.id===id);
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `<h3>${esc(f.name)}</h3>
+    ${f.items.length ? f.items.map(i=>`<div class="folder-item">
+      <span style="font-size:13px">${esc(i.n)}</span>
+      <button class="btn sm danger" onclick="removeFolderItem('${f.id}','${i.id}')">Remove</button>
+    </div>`).join('') : '<div class="empty">Empty folder.</div>'}
+    <div class="mrow"><button class="btn sm" onclick="closeOverlay('modalOverlay')">Close</button></div>`;
+  openOverlay('modalOverlay');
+}
+function removeFolderItem(fid, iid){
+  const f = folders.find(x=>x.id===fid);
+  f.items = f.items.filter(i=>i.id!==iid);
+  saveFolders(); viewFolder(fid); renderFolders();
+}
+
+/* ------------------ 19. FOCUS MODE ------------------ */
+let focus = {
+  running:false, paused:false,
+  subj:'physics', itemId:'', title:'',
+  planned:25, acc:0, runStart:0, startedAt:0
+};
+let lastFocusSummary = null;
+
+function fmtClock(ms){
+  const s = Math.max(0, Math.floor(ms/1000));
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), ss = s%60;
+  return (h>0? String(h).padStart(2,'0')+':' : '') + String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0');
+}
+function focusElapsed(){
+  return focus.acc + (focus.running && !focus.paused ? Date.now()-focus.runStart : 0);
+}
+function focusTick(){
+  if(!focus.running) return;
+  const el = document.getElementById('focusTimer');
+  if(!el) return;
+  const e = focusElapsed();
+  el.textContent = fmtClock(e);
+  el.classList.toggle('warn', e > focus.planned*60000);
+  const bar = document.getElementById('focusBar');
+  if(bar) bar.style.width = Math.min(100, Math.round(e/(focus.planned*60000)*100))+'%';
+  const sub = document.getElementById('focusSub');
+  if(sub){
+    sub.textContent = (focus.paused?'Paused · ':'Running · ') +
+      Math.round(e/60000) + ' min of ' + focus.planned + ' min target';
+  }
+}
+
+function focusSetupHTML(){
+  const subjOpts = Object.keys(SUBJECTS).map(k=>
+    `<option value="${k}" ${focus.subj===k?'selected':''}>${SUBJECTS[k].name}</option>`).join('');
+  const s = SUBJECTS[focus.subj] || SUBJECTS.physics;
+  const itemOpts = ['<option value="">Free study (no specific chapter)</option>']
+    .concat(s.chapters.map(c=>`<option value="${c.id}" ${focus.itemId===c.id?'selected':''}>${esc(c.n)}</option>`))
+    .join('');
+
+  const summary = lastFocusSummary ? `
+    <div class="card" style="margin-bottom:20px;border-color:var(--line)">
+      <span class="tag">Session Complete</span>
+      <h3 style="font-size:18px;margin-bottom:6px">${esc(lastFocusSummary.title)}</h3>
+      <div class="ts">${fmtClock(lastFocusSummary.seconds*1000)} recorded · target ${lastFocusSummary.plannedMin} min</div>
+      ${lastFocusSummary.seconds >= lastFocusSummary.plannedMin*60
+        ? '<div class="ts" style="color:#5fe0a8;margin-top:6px">Target reached.</div>'
+        : '<div class="ts" style="color:#ffcf6b;margin-top:6px">Ended before the target — that is fine, the real duration was recorded.</div>'}
+      <div class="btnrow" style="margin-top:12px">
+        <button class="btn sm" onclick="lastFocusSummary=null;renderFocus()">Dismiss</button>
+      </div>
+    </div>` : '';
+
+  const recent = focusSessions.slice(0,8);
+  const recentHTML = recent.length ? recent.map(s2=>`
+    <div class="folder-item">
+      <div><b style="font-size:13px">${esc(s2.title)}</b>
+      <div class="ts">${fmt(s2.start)} · ${Math.floor(s2.seconds/60)}m ${s2.seconds%60}s of ${s2.plannedMin}m target</div></div>
+      <button class="btn sm danger" onclick="delFocus('${s2.id}')">Delete</button>
+    </div>`).join('') : '<div class="empty">No focus sessions recorded yet.</div>';
+
+  return `${summary}
+    <div class="card" style="margin-bottom:20px">
+      <div class="grid g3">
+        <div>
+          <label class="mini-title" style="display:block;margin-bottom:6px">Subject</label>
+          <select class="field" id="focusSubject" style="width:100%">${subjOpts}</select>
+        </div>
+        <div style="grid-column:span 2">
+          <label class="mini-title" style="display:block;margin-bottom:6px">Chapter / task</label>
+          <select class="field" id="focusItem" style="width:100%">${itemOpts}</select>
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <label class="mini-title" style="display:block;margin-bottom:8px">Target duration</label>
+        <div class="chips" id="focusChips">
+          <button class="chip ${focus.planned===15?'on':''}" data-min="15">15 min</button>
+          <button class="chip ${focus.planned===25?'on':''}" data-min="25">25 min</button>
+          <button class="chip ${focus.planned===45?'on':''}" data-min="45">45 min</button>
+          <input class="field" type="number" min="1" max="240" id="focusCustom" placeholder="Custom"
+            value="${[15,25,45].includes(focus.planned)?'':focus.planned}" style="width:110px;min-width:110px">
+        </div>
+      </div>
+      <div class="btnrow" style="margin-top:20px">
+        <button class="btn gold" id="focusStart">Start Focus Session</button>
+        <button class="btn" onclick="go('#/dashboard')">Back to Dashboard</button>
+      </div>
+    </div>
+    <div class="mini-title" style="margin-bottom:12px">Recent focus sessions</div>
+    <div id="focusRecent">${recentHTML}</div>`;
+}
+
+function focusRunningHTML(){
+  return `<div class="card">
+    <div style="text-align:center;padding:20px 0 10px">
+      <span class="tag">${esc((SUBJECTS[focus.subj]||{name:''}).name)}</span>
+      <h3 style="font-size:19px;margin-bottom:18px">${esc(focus.title)}</h3>
+      <div class="timer" id="focusTimer">00:00</div>
+      <div class="ts" id="focusSub" style="margin-top:12px"></div>
+      <div class="bar" style="max-width:420px;margin:16px auto 0">
+        <i id="focusBar" style="width:0%"></i>
+      </div>
+    </div>
+    <div class="btnrow" style="justify-content:center;margin-top:18px">
+      <button class="btn gold" id="focusPause">${focus.paused?'Resume':'Pause'}</button>
+      <button class="btn danger" id="focusEnd">End Session</button>
+    </div>
+    <div class="note" style="margin-top:20px">
+      Elapsed time is measured from the real system clock. Pausing or switching tabs will not corrupt the recording.
+      Wall-clock time is not the same as attention or lecture-watch time — end the session whenever you like.
+    </div>
+  </div>`;
+}
+
+function renderFocus(){
+  const box = document.getElementById('focusBody');
+  if(!box) return;
+  if(focus.running){
+    box.innerHTML = focusRunningHTML();
+    document.getElementById('focusPause').onclick = ()=>{
+      if(focus.paused){
+        focus.runStart = Date.now();
+        focus.paused = false;
+      } else {
+        focus.acc += Date.now() - focus.runStart;
+        focus.paused = true;
+      }
+      renderFocus();
+      focusTick();
+    };
+    document.getElementById('focusEnd').onclick = focusEnd;
+    focusTick();
+    return;
+  }
+  box.innerHTML = focusSetupHTML();
+
+  const subjSel = document.getElementById('focusSubject');
+  subjSel.onchange = ()=>{
+    focus.subj = subjSel.value;
+    focus.itemId = '';
+    renderFocus();
+  };
+  const itemSel = document.getElementById('focusItem');
+  itemSel.onchange = ()=>{ focus.itemId = itemSel.value; };
+
+  document.querySelectorAll('#focusChips .chip').forEach(ch=>{
+    ch.onclick = ()=>{
+      focus.planned = parseInt(ch.getAttribute('data-min'),10);
+      renderFocus();
+    };
+  });
+  const custom = document.getElementById('focusCustom');
+  if(custom){
+    custom.onchange = ()=>{
+      const v = Math.max(1, Math.min(240, parseInt(custom.value,10)||25));
+      focus.planned = v;
+      renderFocus();
+    };
+  }
+  document.getElementById('focusStart').onclick = ()=>{
+    focus.itemId = itemSel.value;
+    const it = focus.itemId ? findItem(focus.itemId) : null;
+    focus.title = it ? it.n : ((SUBJECTS[focus.subj]||{name:'Study'}).name + ' — Free study');
+    focus.acc = 0;
+    focus.runStart = Date.now();
+    focus.startedAt = Date.now();
+    focus.paused = false;
+    focus.running = true;
+    lastFocusSummary = null;
+    renderFocus();
+  };
+}
+
+function focusEnd(){
+  const elapsed = focusElapsed();
+  const seconds = Math.max(1, Math.round(elapsed/1000));
+  const entry = {
+    id: uid('fs'),
+    subj: focus.subj,
+    itemId: focus.itemId,
+    title: focus.title,
+    start: focus.startedAt || Date.now(),
+    end: Date.now(),
+    plannedMin: focus.planned,
+    seconds: seconds
+  };
+  focusSessions.unshift(entry);
+  focusSessions = focusSessions.slice(0,60);
+  saveFocus();
+  focus.running = false;
+  focus.paused = false;
+  focus.acc = 0;
+  lastFocusSummary = entry;
+  renderFocus();
+  toast('Focus session saved · '+Math.round(seconds/60)+' min');
+}
+
+function delFocus(id){
+  focusSessions = focusSessions.filter(s=>s.id!==id);
+  saveFocus();
+  renderFocus();
+}
+
+/* Global tick — safe no-op when Focus Mode is not running */
+setInterval(focusTick, 500);
+
+/* ------------------ 20. SETTINGS ------------------ */
+function renderSettings(){
+  document.getElementById('setName').value = profile.name||'';
+  document.getElementById('setUser').value = profile.username||'';
+  document.getElementById('setMotion').checked = !!settings.motion;
+  document.getElementById('setCompact').checked = !!settings.compact;
+  document.getElementById('setGoal').value = settings.goal||4;
+
+  document.getElementById('cdList').innerHTML = countdowns.map(c=>`
+    <div class="folder-item">
+      <div><b style="font-size:13.5px">${esc(c.name)}</b><div class="ts">${esc(String(c.date).replace('T',' '))}</div></div>
+      <button class="btn sm danger" onclick="delCountdown('${c.id}')">Delete</button>
+    </div>`).join('');
+}
+function delCountdown(id){
+  if(countdowns.length<=1){ toast('Keep at least one countdown'); return; }
+  countdowns = countdowns.filter(c=>c.id!==id); saveCountdowns(); renderSettings(); tickCountdown();
+}
+document.getElementById('cdAdd').onclick = ()=>{
+  const n = document.getElementById('cdName').value.trim() || 'Countdown';
+  const d = document.getElementById('cdDate').value;
+  if(!d){ toast('Choose a date and time'); return; }
+  countdowns.push({id:uid('cd'), name:n, date:d});
+  saveCountdowns(); renderSettings(); tickCountdown(); toast('Countdown saved');
+};
+document.getElementById('cdReset').onclick = ()=>{
+  if(!countdowns.some(c=>c.id==='cd-default')) countdowns.unshift(Object.assign({},DEFAULT_CD));
+  saveCountdowns(); renderSettings(); tickCountdown(); toast('Default countdown restored');
+};
+document.getElementById('btnSaveProfile').onclick = ()=>{
+  profile.name = document.getElementById('setName').value.trim();
+  profile.username = document.getElementById('setUser').value.trim();
+  saveProfile(); updateAvatar(); toast('Profile saved');
+};
+document.getElementById('setMotion').onchange = e=>{
+  settings.motion = e.target.checked; saveSettings();
+  document.body.classList.toggle('rm', settings.motion);
+};
+document.getElementById('setCompact').onchange = e=>{
+  settings.compact = e.target.checked; saveSettings();
+  document.body.classList.toggle('compact', settings.compact);
+};
+document.getElementById('setGoal').onchange = e=>{
+  settings.goal = Math.max(1, Math.min(20, parseInt(e.target.value,10)||4)); saveSettings();
+};
+document.getElementById('btnPickPhoto').onclick = ()=> document.getElementById('photoInput').click();
+document.getElementById('btnClearPhoto').onclick = ()=>{
+  profile.photo=''; saveProfile(); updateAvatar(); toast('Photo removed');
+};
+document.getElementById('photoInput').onchange = e=>{
+  const f = e.target.files[0]; if(!f) return;
+  if(!f.type.startsWith('image/')){ toast('Please choose an image file'); return; }
+  readImage(f, data=>{
+    profile.photo = data; saveProfile(); updateAvatar(); toast('Photo updated');
+  });
+};
+function readImage(file, cb){
+  const fr = new FileReader();
+  fr.onload = ()=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const max = 256;
+      let w = img.width, h = img.height;
+      if(w>h){ if(w>max){ h = h*max/w; w = max; } }
+      else { if(h>max){ w = w*max/h; h = max; } }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      try{ cb(c.toDataURL('image/jpeg',0.82)); }catch(e){ cb(fr.result); }
+    };
+    img.onerror = ()=> cb(fr.result);
+    img.src = fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+function setAvatar(container){
+  if(!container) return;
+  if(profile.photo){
+    container.innerHTML = '<img src="'+profile.photo+'" alt="Profile">';
+  } else {
+    container.innerHTML = '<span>'+(profile.name? esc(profile.name[0].toUpperCase()) : 'M')+'</span>';
+  }
+}
+function updateAvatar(){
+  setAvatar(document.getElementById('avatarBtn'));
+  const d = document.getElementById('dashAvatar');
+  if(d) setAvatar(d);
+}
+
+/* Backup */
+document.getElementById('btnExport').onclick = ()=>{
+  const data = {
+    app:'M-Board', version:2, exported:new Date().toISOString(),
+    progress, pyq, events, folders, profile, countdowns, settings, focus:focusSessions
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'm-board-backup-'+ymd(new Date())+'.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Backup exported');
+};
+document.getElementById('btnImport').onclick = ()=> document.getElementById('importInput').click();
+document.getElementById('importInput').onchange = e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const fr = new FileReader();
+  fr.onload = ()=>{
+    try{
+      const d = JSON.parse(fr.result);
+      if(!d || typeof d!=='object' || d.app!=='M-Board'){ toast('Not a valid M-Board backup'); return; }
+      if(!confirm('This will replace your current progress with the imported backup. Continue?')) return;
+      progress = d.progress||{}; pyq = d.pyq||{}; events = d.events||[];
+      folders = d.folders||[]; profile = d.profile||{name:'',username:'',photo:''};
+      countdowns = (d.countdowns&&d.countdowns.length)?d.countdowns:[Object.assign({},DEFAULT_CD)];
+      settings = Object.assign({motion:false,compact:false,goal:4}, d.settings||{});
+      focusSessions = Array.isArray(d.focus)?d.focus:[];
+      saveProgress(); savePyq(); saveEvents(); saveFolders(); saveProfile();
+      saveCountdowns(); saveSettings(); saveFocus();
+      applySettings(); updateAvatar(); route(); tickCountdown(); toast('Backup imported');
+    }catch(err){ toast('Invalid JSON file'); }
+  };
+  fr.readAsText(f);
+  e.target.value='';
+};
+document.getElementById('btnResetAll').onclick = ()=>{
+  if(!confirm('This will permanently delete ALL your M-Board data on this device. Continue?')) return;
+  if(!confirm('Are you absolutely sure? This cannot be undone.')) return;
+  ['mb_progress','mb_pyq','mb_events','mb_folders','mb_profile','mb_countdowns','mb_settings','mb_focus']
+    .forEach(k=>DB.del(k));
+  location.reload();
+};
+function applySettings(){
+  document.body.classList.toggle('rm', !!settings.motion);
+  document.body.classList.toggle('compact', !!settings.compact);
+}
+
+/* ------------------ 21. SEARCH ------------------ */
+function buildIndex(){
+  const idx = [];
+  Object.keys(SUBJECTS).forEach(k=>{
+    idx.push({t:SUBJECTS[k].name, s:'Subject Portal', h:'#/subject/'+k});
+    SUBJECTS[k].chapters.forEach(c=>idx.push({t:c.n, s:SUBJECTS[k].name, h:'#/subject/'+k}));
+  });
+  ADV_CHEM.forEach(a=>idx.push({t:a.n, s:'Advanced Chemistry', h:'#/advanced/'+a.cat}));
+  idx.push({t:'Advanced Chemistry', s:'Chemistry Portal', h:'#/advanced'});
+  REVISION.forEach(x=>idx.push({t:x.n, s:'Complete Revision', h:'#/revision'}));
+  ADV_PUSH.forEach(x=>idx.push({t:x.n, s:'Advance Push for Boards', h:'#/advance'}));
+  ANALYSIS.forEach(x=>idx.push({t:x.n+' — Sample Paper Analysis', s:'Sample Paper Analysis', h:'#/analysis'}));
+  Object.keys(ENG_CATS).forEach(k=>{
+    idx.push({t:ENG_CATS[k].n, s:'English Core', h:'#/english/'+k});
+    ENG_CATS[k].groups.forEach(g=>g.items.forEach(i=>idx.push({t:i.n, s:'English · '+g.n, h:'#/english/'+k})));
+  });
+  idx.push({t:'Poet & Author Names', s:'English Core', h:'#/english/authors'});
+  idx.push({t:'ALS Preparation', s:'English Core', h:'#/english/als'});
+  idx.push({t:'Practicals', s:'Resources', h:'#/practicals'});
+  idx.push({t:'Weightage', s:'Resources', h:'#/weightage'});
+  idx.push({t:'PYQ Tracker', s:'Resources', h:'#/pyq'});
+  idx.push({t:'Focus Mode', s:'Tools', h:'#/focus'});
+  idx.push({t:'Calendar', s:'Tools', h:'#/calendar'});
+  idx.push({t:'My Folders', s:'Tools', h:'#/folders'});
+  idx.push({t:'Settings', s:'Tools', h:'#/settings'});
+  return idx;
+}
+const INDEX = buildIndex();
+function runSearch(q, outId){
+  const out = document.getElementById(outId);
+  if(!q){ out.innerHTML = '<div class="ts" style="padding:10px">Type to search…</div>'; return; }
+  const res = INDEX.filter(x=>x.t.toLowerCase().includes(q.toLowerCase())||x.s.toLowerCase().includes(q.toLowerCase())).slice(0,40);
+  out.innerHTML = res.length ? res.map(r=>
+    `<a href="${r.h}" onclick="closeOverlay('searchOverlay')"><b>${esc(r.t)}</b><span>${esc(r.s)}</span></a>`).join('')
+    : '<div class="ts" style="padding:10px">No results found.</div>';
+}
+document.getElementById('btnSearch').onclick = ()=>{
+  openOverlay('searchOverlay');
+  document.getElementById('globalSearch').value='';
+  runSearch('','globalRes');
+  setTimeout(()=>document.getElementById('globalSearch').focus(),80);
+};
+document.getElementById('globalSearch').oninput = e=> runSearch(e.target.value,'globalRes');
+document.getElementById('helperBtn').onclick = ()=> runSearch(document.getElementById('helperInput').value,'helperRes');
+document.getElementById('helperInput').oninput = e=> runSearch(e.target.value,'helperRes');
+
+/* ------------------ 22. COUNTDOWN ------------------ */
+function tickCountdown(){
+  const now = Date.now();
+  const cds = countdowns.slice().sort((a,b)=> new Date(a.date)-new Date(b.date));
+  const c = cds.find(x=> new Date(x.date).getTime() > now) || cds[0];
+  if(!c) return;
+  const target = new Date(c.date).getTime();
+  let diff = target - now;
+  const hEl = document.getElementById('cdD'), hh = document.getElementById('cdH'),
+        hm = document.getElementById('cdM'), hs = document.getElementById('cdS');
+  const lbl = document.getElementById('cdLabel');
+  if(diff <= 0){
+    [hEl,hh,hm,hs].forEach(e=>{ if(e) e.textContent = '00'; });
+    if(lbl) lbl.textContent = '"'+c.name+'" target date has passed.';
+  } else {
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor((diff%86400000)/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    const s = Math.floor((diff%60000)/1000);
+    if(hEl) hEl.textContent = String(d).padStart(2,'0');
+    if(hh) hh.textContent = String(h).padStart(2,'0');
+    if(hm) hm.textContent = String(m).padStart(2,'0');
+    if(hs) hs.textContent = String(s).padStart(2,'0');
+    if(lbl) lbl.textContent = '"'+c.name+'" — target '+new Date(c.date).toLocaleString()+'. This is a personal countdown target, not an official CBSE date.';
+  }
+  const d2 = {d:document.getElementById('dCdD'),h:document.getElementById('dCdH'),
+              m:document.getElementById('dCdM'),s:document.getElementById('dCdS')};
+  if(d2.d){
+    if(diff<=0){ Object.values(d2).forEach(e=>e.textContent='00'); }
+    else{
+      d2.d.textContent = String(Math.floor(diff/86400000)).padStart(2,'0');
+      d2.h.textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+      d2.m.textContent = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+      d2.s.textContent = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    }
+  }
+  const dl = document.getElementById('dCdLabel');
+  if(dl) dl.textContent = '"'+c.name+'" · '+new Date(c.date).toLocaleDateString();
+}
+
+/* ------------------ 23. HERO STATS ------------------ */
+function updateHero(){
+  const p = subjectStats('physics'), c = subjectStats('chemistry'), o = overallStats();
+  const set = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  const setW = (id,v)=>{ const e=document.getElementById(id); if(e) e.style.width=v+'%'; };
+  set('hvPhy', p.pct+'%'); setW('hvPhyBar', p.pct);
+  set('hvPhyTxt', p.done+' / '+p.total);
+  set('hvChem', c.pct+'%'); setW('hvChemBar', c.pct);
+  set('hvChemTxt', c.done+' / '+c.total);
+  set('hvAll', o.pct+'%');
+}
+
+/* ------------------ 24. REFRESH ------------------ */
+function refreshCards(){
+  const h = location.hash || '#/home';
+  const parts = h.replace(/^#\/?/,'').split('/').filter(Boolean);
+  const name = parts[0]||'home';
+  const a = parts[1]||'';
+  const b = parts[2]||'';
+
+  if(name==='dashboard') renderDashboard();
+  else if(name==='subject') renderSubjectPortal(a);
+  else if(name==='advanced') renderAdvanced(a);
+  else if(name==='english') renderEnglish(a,b);
+  else if(name==='pyq') renderPyq(a);
+  else if(name==='practicals') renderPracticals(a);
+  else if(name==='weightage') renderWeightage(a);
+  else if(name==='revision'||name==='advance'||name==='analysis'||name==='subjects') route();
+  else if(name==='folders') renderFolders();
+  updateHero();
+}
+
+/* ------------------ 25. TILT ------------------ */
+function initTilt(root){
+  if(settings.motion) return;
+  (root||document).querySelectorAll('.tilt').forEach(el=>{
+    if(el._tilt) return;
+    el._tilt = true;
+    el.addEventListener('mousemove', ev=>{
+      const r = el.getBoundingClientRect();
+      const x = (ev.clientX-r.left)/r.width - .5;
+      const y = (ev.clientY-r.top)/r.height - .5;
+      el.style.transform = `perspective(820px) rotateY(${x*7}deg) rotateX(${-y*7}deg) translateY(-4px)`;
+    });
+    el.addEventListener('mouseleave', ()=>{ el.style.transform=''; });
+  });
+}
+
+/* ------------------ 26. PROFILE OVERLAY ------------------ */
+document.getElementById('avatarBtn').onclick = ()=>{ go('#/settings'); };
+document.getElementById('pPhotoBtn').onclick = ()=> document.getElementById('pPhotoInput').click();
+document.getElementById('pPhotoInput').onchange = e=>{
+  const f = e.target.files[0]; if(!f) return;
+  readImage(f, d=>{
+    document.getElementById('pPhotoTxt').textContent = 'Photo selected';
+    document.getElementById('pPhotoInput')._data = d;
+  });
+};
+document.getElementById('pSave').onclick = ()=>{
+  profile.name = document.getElementById('pName').value.trim();
+  profile.username = document.getElementById('pUser').value.trim();
+  const d = document.getElementById('pPhotoInput')._data;
+  if(d) profile.photo = d;
+  saveProfile(); updateAvatar(); closeOverlay('profileOverlay'); toast('Profile saved');
+};
+
+/* ------------------ 27. MOBILE NAV ------------------ */
+document.getElementById('burger').onclick = ()=>{
+  document.getElementById('mainNav').classList.toggle('open');
+};
+
+/* ------------------ 28. INIT ------------------ */
+function init(){
+  applySettings();
+  updateAvatar();
+  tickCountdown();
+  setInterval(tickCountdown, 1000);
+  updateHero();
+  route();
+  initTilt(document);
+
+  if(!profile.name){
+    setTimeout(()=> openOverlay('profileOverlay'), 600);
+  }
+}
+init();
+</script>
+</body>
+</html>
